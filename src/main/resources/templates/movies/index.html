@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MovieAI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        /* Custom styles for dark mode */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #121212; /* Dark background */
+            color: #e0e0e0; /* Light text */
+        }
+        .card {
+            background-color: #1e1e1e; /* Dark card background */
+            color: #e0e0e0; /* Light text */
+            transition: transform 0.2s; /* Smooth transition for card hover effect */
+        }
+        .card:hover {
+            transform: scale(1.05); /* Enlarge card on hover */
+        }
+        .navbar, .footer, .modal-content {
+            background-color: #1e1e1e; /* Dark background for navbar, footer, and modals */
+        }
+        .footer {
+            color: #e0e0e0; /* Light text */
+        }
+        main {
+            flex: 1;
+        }
+        
+    </style>
+</head>
+<body>
+
+<!-- Header with Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/movies" style="background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #0000ff, #ff00ff, #00ffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+    MovieAI
+</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Phim Hot</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Phim Lẻ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Phim Bộ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Phim Mới</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/movies/faq">FAQ</a>
+                </li>
+                <li class="nav-item">
+    <a class="nav-link" href="/movies/search">Tìm Kiếm</a>
+</li>
+
+
+
+            </ul>
+           
+          <div class="dropdown">
+    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fas fa-chevron-down"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+        <li>
+            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#loginSignupModal">Đăng Nhập</a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#loginSignupModal">Đăng Kí</a>
+        </li>
+    </ul>
+</div>
+
+        </div>
+    </div>
+</nav>
+ 
+
+
+<main class="container mt-4">
+   
+    
+    <!-- Parent container for filter bar and movie cards -->
+    <div class="movie-container">
+        <!-- Filter bar -->
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <form>
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            <label for="inputType" class="form-label">Loại phim:</label>
+                            <select id="inputType" class="form-select">
+                                <option selected>Tất cả</option>
+                                <option selected>Phim lẻ</option>
+                                <!-- Add other options here -->
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="inputGenre" class="form-label">Thể loại:</label>
+                            <select id="inputGenre" class="form-select">
+                                <option selected>Tất cả</option>
+                                <!-- Add other options here -->
+                            </select>
+                        </div>
+                       
+                        <div class="col-md-2">
+                            <label for="inputYear" class="form-label">Năm:</label>
+                            <select id="inputYear" class="form-select">
+                                <option selected>Tất cả</option>
+                                <!-- Add other options here -->
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="inputDuration" class="form-label">Thời lượng:</label>
+                            <select id="inputDuration" class="form-select">
+                                <option selected>Tất cả</option>
+                                <!-- Add other options here -->
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="inputSort" class="form-label">Sắp xếp:</label>
+                            <select id="inputSort" class="form-select">
+                                <option selected>Ngày cập nhật</option>
+                                <!-- Add other options here -->
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        
+<!-- Top Favorite Film Section -->
+<div class="text-start text-yellow-dark ps-3"> <!-- Added Bootstrap classes for text alignment, color, and padding -->
+   <h2 style="color: #FFD700;">Phim Đề Cử</h2> <!-- Remove class "text-center" to align to the left -->
+    <div class="row row-cols-1 row-cols-md-6 g-4" id="topFavoriteFilms">
+        <!-- Top favorite films will be dynamically inserted here -->
+        <div th:each="movie : ${topFavoriteFilms}" class="col">
+            <a th:href="@{'/movies/detail/' + ${movie.id}}" class="text-decoration-none text-light">
+                <div class="card">
+                    <img th:src="@{'/posters/' + ${movie.posterPath} + '.jpg'}" class="card-img-top" alt="Movie Image">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${movie.originalTitle}"></h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Latest Film Update Section -->
+<div class="text-start text-yellow-dark ps-3"> <!-- Added Bootstrap classes for text alignment, color, and padding -->
+    <h2 style="color: #FFD700;">Phim Mới Cập Nhập</h2> <!-- Remove class "text-center" to align to the left -->
+    <div class="row row-cols-1 row-cols-md-6 g-4" id="latestFilms">
+        <!-- Latest films will be dynamically inserted here -->
+        <div th:each="movie : ${latestFilms}" class="col">
+            <a th:href="@{'/movies/detail/' + ${movie.id}}" class="text-decoration-none text-light">
+                <div class="card">
+                    <img th:src="@{'/posters/' + ${movie.posterPath} + '.jpg'}" class="card-img-top" alt="Movie Image">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${movie.originalTitle}"></h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+    
+ <h1 class="text-center my-4" style="color: #FFD700;">Danh Sách Phim</h1>  
+<div class="row row-cols-1 row-cols-md-6 g-4">
+    <!-- Movie cards will be dynamically inserted here -->
+    <div th:each="movie : ${movies}" class="col">
+        <a th:href="@{'/movies/detail/' + ${movie.id}}" class="text-decoration-none text-light">
+            <div class="card">
+                <!-- Concatenate the image path with the directory where images are stored -->
+                <img th:src="@{'/posters/' + ${movie.posterPath} + '.jpg'}" class="card-img-top" alt="Movie Image">
+                <div class="card-body">
+                    <!-- Display the movie title -->
+                    <h5 class="card-title" th:text="${movie.originalTitle}"></h5>
+                    <!-- You can add more details here if needed -->
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+
+
+    </div>
+</main>
+
+
+<!-- Login/Signup Modal -->
+<div class="modal fade" id="loginSignupModal" tabindex="-1" aria-labelledby="loginSignupModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginSignupModalLabel">Login / Sign Up</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Login Form -->
+                <form>
+                    <div class="mb-3">
+                        <label for="loginEmail" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="loginEmail" aria-describedby="emailHelp">
+                    </div>
+                    <div class="mb-3">
+                        <label for="loginPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="loginPassword">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+                <hr>
+                <p>Don't have an account? <a href="#">Sign Up</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Footer -->
+<footer class="footer bg-dark text-light text-center py-4 mt-auto">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <!-- Add pagination here -->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center" id="pagination">
+                        <!-- Pagination links will be dynamically generated here -->
+                        <input type="hidden" id="totalPages" value="${totalPages}">
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <hr>
+        <p>&copy; 2024 MovieAI. All rights reserved.</p>
+    </div>
+</footer>
+
+<script>
+//Function to get URL parameter
+function getUrlParameter(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+}
+
+// Function to dynamically generate pagination links
+function generatePagination(currentPage, totalPages) {
+    var paginationElement = document.getElementById('pagination');
+    paginationElement.innerHTML = ''; // Clear existing pagination links
+
+    // Add Previous page link
+    paginationElement.innerHTML += `<li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                        <a class="page-link" href="?page=${currentPage - 1}" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>`;
+
+    // Calculate start and end page numbers
+    var startPage, endPage;
+    if (totalPages <= 5) {
+        startPage = 1;
+        endPage = totalPages;
+    } else if (currentPage <= 3) {
+        startPage = 1;
+        endPage = 5;
+    } else if (currentPage + 2 >= totalPages) {
+        startPage = totalPages - 4;
+        endPage = totalPages;
+    } else {
+        startPage = currentPage - 2;
+        endPage = currentPage + 2;
+    }
+
+    // Add individual page links
+    for (var i = startPage; i <= endPage; i++) {
+        paginationElement.innerHTML += `<li class="page-item ${i == currentPage ? 'active' : ''}">
+                                            <a class="page-link" href="?page=${i}">${i}</a>
+                                        </li>`;
+    }
+
+    // Add Next page link
+    paginationElement.innerHTML += `<li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                        <a class="page-link" href="?page=${currentPage + 1}" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>`;
+}
+
+// Call the function to generate pagination links when the page loads
+window.onload = function() {
+    var currentPage = parseInt(getUrlParameter('page')) || 1; // Get current page from URL or default to 1
+    var totalPages = parseInt(document.getElementById('totalPages').value); // Get total pages from hidden field
+    generatePagination(currentPage, totalPages);
+};
+
+
+async function handleSearch(event) {
+    event.preventDefault(); // Prevents the default form submission behavior
+    const searchInput = document.getElementById('searchInput').value;
+    const filteredMovies = await fetchMovies(searchInput);
+    renderMovieCards(filteredMovies);
+}
+
+async function fetchMovies(searchQuery = '') {
+    try {
+        const response = await fetch(`/movies?searchQuery=${searchQuery}`);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching movies:', error);
+    }
+}
+
+async function renderMovieCards(movies) {
+    const movieCardsContainer = document.getElementById('movieCards');
+    // Clear previous movie cards
+    movieCardsContainer.innerHTML = '';
+    // Loop through the first 20 movies or less if there are fewer than 20 movies
+    for (let i = 0; i < Math.min(20, movies.length); i++) {
+        const movie = movies[i];
+        const card = document.createElement('div');
+        card.classList.add('col-md-3'); // Adjust the column width
+        card.innerHTML = `
+            <div class="card">
+                <a href="/movies/detail/${movie.id}">
+                    <img src="/images/${movie.imageFileName}" class="card-img-top" alt="Movie Image">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">${movie.title}</h5>
+                    <p class="card-text">${movie.description}</p>
+                    <a href="/movies/detail/${movie.id}" class="btn btn-primary">View Details</a>
+                </div>
+            </div>
+        `;
+        movieCardsContainer.appendChild(card);
+    }
+}
+
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    </body>
+    </html>
+
