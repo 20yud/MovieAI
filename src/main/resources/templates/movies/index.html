@@ -1,4 +1,4 @@
-<!doctype html>
+<!-- <!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -36,7 +36,7 @@
 </head>
 <body>
 
-<!-- Header with Navbar -->
+Header with Navbar
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="/movies" style="background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #0000ff, #ff00ff, #00ffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
@@ -48,22 +48,21 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Phim Hot</a>
+                    <a class="nav-link" href="movies/top">Phim Hot</a>
                 </li>
+               
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Phim Lẻ</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Phim Bộ</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Phim Mới</a>
+                    <a class="nav-link" href="movies/newest">Phim Mới</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/movies/faq">FAQ</a>
                 </li>
                 <li class="nav-item">
     <a class="nav-link" href="/movies/search">Tìm Kiếm</a>
+    
+      <li class="nav-item">
+          <a class="nav-link" href="/logout">Logout</a>
+        </li>
 </li>
 
 
@@ -93,9 +92,9 @@
 <main class="container mt-4">
    
     
-    <!-- Parent container for filter bar and movie cards -->
+    Parent container for filter bar and movie cards
     <div class="movie-container">
-        <!-- Filter bar -->
+        Filter bar
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <form>
@@ -105,14 +104,14 @@
                             <select id="inputType" class="form-select">
                                 <option selected>Tất cả</option>
                                 <option selected>Phim lẻ</option>
-                                <!-- Add other options here -->
+                                Add other options here
                             </select>
                         </div>
                         <div class="col-md-2">
                             <label for="inputGenre" class="form-label">Thể loại:</label>
                             <select id="inputGenre" class="form-select">
                                 <option selected>Tất cả</option>
-                                <!-- Add other options here -->
+                                Add other options here
                             </select>
                         </div>
                        
@@ -120,21 +119,21 @@
                             <label for="inputYear" class="form-label">Năm:</label>
                             <select id="inputYear" class="form-select">
                                 <option selected>Tất cả</option>
-                                <!-- Add other options here -->
+                                Add other options here
                             </select>
                         </div>
                         <div class="col-md-2">
                             <label for="inputDuration" class="form-label">Thời lượng:</label>
                             <select id="inputDuration" class="form-select">
                                 <option selected>Tất cả</option>
-                                <!-- Add other options here -->
+                                Add other options here
                             </select>
                         </div>
                         <div class="col-md-2">
                             <label for="inputSort" class="form-label">Sắp xếp:</label>
                             <select id="inputSort" class="form-select">
                                 <option selected>Ngày cập nhật</option>
-                                <!-- Add other options here -->
+                                Add other options here
                             </select>
                         </div>
                     </div>
@@ -143,15 +142,15 @@
         </div>
         
         
-<!-- Top Favorite Film Section -->
-<div class="text-start text-yellow-dark ps-3"> <!-- Added Bootstrap classes for text alignment, color, and padding -->
-   <h2 style="color: #FFD700;">Phim Đề Cử</h2> <!-- Remove class "text-center" to align to the left -->
+Top Favorite Film Section
+<div class="text-start text-yellow-dark ps-3"> Added Bootstrap classes for text alignment, color, and padding
+   <h2 style="color: #FFD700;">Phim Đề Cử</h2> Remove class "text-center" to align to the left
     <div class="row row-cols-1 row-cols-md-6 g-4" id="topFavoriteFilms">
-        <!-- Top favorite films will be dynamically inserted here -->
+        Top favorite films will be dynamically inserted here
         <div th:each="movie : ${topFavoriteFilms}" class="col">
             <a th:href="@{'/movies/detail/' + ${movie.id}}" class="text-decoration-none text-light">
                 <div class="card">
-                    <img th:src="@{'/posters/' + ${movie.posterPath} + '.jpg'}" class="card-img-top" alt="Movie Image">
+                    <img th:src="@{'/images/posters' + ${movie.posterPath} + '.jpg'}" class="card-img-top" alt="Movie Image">
                     <div class="card-body">
                         <h5 class="card-title" th:text="${movie.originalTitle}"></h5>
                     </div>
@@ -161,15 +160,15 @@
     </div>
 </div>
 
-<!-- Latest Film Update Section -->
-<div class="text-start text-yellow-dark ps-3"> <!-- Added Bootstrap classes for text alignment, color, and padding -->
-    <h2 style="color: #FFD700;">Phim Mới Cập Nhập</h2> <!-- Remove class "text-center" to align to the left -->
+Latest Film Update Section
+<div class="text-start text-yellow-dark ps-3"> Added Bootstrap classes for text alignment, color, and padding
+    <h2 style="color: #FFD700;">Phim Mới Cập Nhập</h2> Remove class "text-center" to align to the left
     <div class="row row-cols-1 row-cols-md-6 g-4" id="latestFilms">
-        <!-- Latest films will be dynamically inserted here -->
+        Latest films will be dynamically inserted here
         <div th:each="movie : ${latestFilms}" class="col">
             <a th:href="@{'/movies/detail/' + ${movie.id}}" class="text-decoration-none text-light">
                 <div class="card">
-                    <img th:src="@{'/posters/' + ${movie.posterPath} + '.jpg'}" class="card-img-top" alt="Movie Image">
+                    <img th:src="@{'/images/posters' + ${movie.posterPath} + '.jpg'}" class="card-img-top" alt="Movie Image">
                     <div class="card-body">
                         <h5 class="card-title" th:text="${movie.originalTitle}"></h5>
                     </div>
@@ -182,16 +181,17 @@
     
  <h1 class="text-center my-4" style="color: #FFD700;">Danh Sách Phim</h1>  
 <div class="row row-cols-1 row-cols-md-6 g-4">
-    <!-- Movie cards will be dynamically inserted here -->
+    Movie cards will be dynamically inserted here
     <div th:each="movie : ${movies}" class="col">
         <a th:href="@{'/movies/detail/' + ${movie.id}}" class="text-decoration-none text-light">
             <div class="card">
-                <!-- Concatenate the image path with the directory where images are stored -->
-                <img th:src="@{'/posters/' + ${movie.posterPath} + '.jpg'}" class="card-img-top" alt="Movie Image">
+                Concatenate the image path with the directory where images are stored
+                <img th:src="@{'images/posters' + ${movie.posterPath} + '.jpg'}" class="card-img-top" alt="Movie Image">
                 <div class="card-body">
-                    <!-- Display the movie title -->
+                    Display the movie title
                     <h5 class="card-title" th:text="${movie.originalTitle}"></h5>
-                    <!-- You can add more details here if needed -->
+                    
+                    You can add more details here if needed
                 </div>
             </div>
         </a>
@@ -204,42 +204,16 @@
 </main>
 
 
-<!-- Login/Signup Modal -->
-<div class="modal fade" id="loginSignupModal" tabindex="-1" aria-labelledby="loginSignupModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="loginSignupModalLabel">Login / Sign Up</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Login Form -->
-                <form>
-                    <div class="mb-3">
-                        <label for="loginEmail" class="form-label">Email address</label>
-                        <input type="email" class="form-control" id="loginEmail" aria-describedby="emailHelp">
-                    </div>
-                    <div class="mb-3">
-                        <label for="loginPassword" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="loginPassword">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
-                </form>
-                <hr>
-                <p>Don't have an account? <a href="#">Sign Up</a></p>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Footer -->
+
+Footer
 <footer class="footer bg-dark text-light text-center py-4 mt-auto">
     <div class="container">
         <div class="row">
             <div class="col">
-                <!-- Add pagination here -->
+                Add pagination here
                 <nav aria-label="Page navigation">
                     <ul class="pagination justify-content-center" id="pagination">
-                        <!-- Pagination links will be dynamically generated here -->
+                        Pagination links will be dynamically generated here
                         <input type="hidden" id="totalPages" value="${totalPages}">
                     </ul>
                 </nav>
@@ -310,12 +284,7 @@ window.onload = function() {
 };
 
 
-async function handleSearch(event) {
-    event.preventDefault(); // Prevents the default form submission behavior
-    const searchInput = document.getElementById('searchInput').value;
-    const filteredMovies = await fetchMovies(searchInput);
-    renderMovieCards(filteredMovies);
-}
+
 
 async function fetchMovies(searchQuery = '') {
     try {
@@ -358,3 +327,4 @@ async function renderMovieCards(movies) {
     </body>
     </html>
 
+ -->

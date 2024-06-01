@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="base::Layout(~{::section})">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch Movie</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<section>
+    
+    <div id="moviePlayer">
+        <p th:if="${embedLink == null}">Embed link is not available for the selected movie.</p>
+        <div th:if="${embedLink != null}" class="embed-responsive embed-responsive-16by9">
+            <iframe class="embed-responsive-item" th:src="${embedLink}" frameborder="0" width="100%" height="720" allowfullscreen></iframe>
+             <p class="text-center my-4" style="font-size: 10px; ;" onmouseover="this.style.fontSize='10px'; this.style.color='#FF5733';" onmouseout="this.style.fontSize='10px'; this.style.color='white';">Phim bị giật hình / mất tiếng nhân vật?</p>
+
+        </div>
+    </div>
+    
+ <!-- Movie Detail Section -->
+<div class="container mt-8">
+    <div class="row justify-content-center">
+        <!-- Adjusted column sizes for better alignment -->
+      
+        <div class="col-md-12">
+            <!-- Movie Title -->
+            <h1 th:text="${movie.originalTitle}" class="fw-bold mb-3" style="color: #FFD700;"></h1>
+            
+            <!-- Subtitle Options -->
+            <p>Dưới đây là các phụ đề của phim này được hệ thống lấy tự động từ subscene.com. Nếu chọn được một phụ đề vừa ý (khớp thời gian & dịch chuẩn), hãy phụ đề đó để lần sau xem lại phim, hệ thống sẽ tự động sử dụng phụ đề đó cho bạn!</p>
+
+            <!-- Upload Subtitle Button -->
+            <p><a href="#" class="btn btn-primary">Upload file phụ đề của riêng bạn</a></p>
+<!-- Select Subtitle Section -->
+<!-- Select Subtitle Section -->
+<p>Vui lòng chọn phụ đề:</p>
+<div style="display: flex; flex-direction: column; align-items: flex-start;">
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 20px;">
+        <p style="margin-right: auto;">Vietsub#1</p>
+        <button class="btn btn-secondary" onclick="toggleButton(this)">Chọn</button>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 20px;">
+        <p style="margin-right: auto;">Vietsub#2</p>
+        <button class="btn btn-secondary">Chọn</button>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 20px;">
+        <p style="margin-right: auto;">English</p>
+        <button class="btn btn-secondary">Chọn</button>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 20px;">
+        <p style="margin-right: auto;">Japan</p>
+        <button class="btn btn-secondary">Chọn</button>
+    </div>
+</div>
+
+<script>
+    // Function to toggle button state
+    function toggleButton(button) {
+        if (button.innerText === 'Đã chọn') {
+            button.innerText = 'Chọn';
+            button.classList.remove('btn-success');
+            button.classList.add('btn-secondary');
+        } else {
+            button.innerText = 'Đã chọn';
+            button.classList.remove('btn-secondary');
+            button.classList.add('btn-success');
+        }
+    }
+
+    // Set button state on page load
+    window.onload = function() {
+        var button = document.querySelector('.btn-secondary');
+        toggleButton(button);
+    };
+</script>
+
+
+            <!-- Additional Movie Details -->
+            <ul class="text-left" style="margin-top: 200px; margin-bottom: 50px;">
+                <li style="margin-bottom:10px; font-weight: bold;">MovieAI là ứng dụng hỗ trợ xem phim trực tuyến với nhiều tính năng hấp dẫn:</li>
+                <ul>
+                    <li>Là phim bluray (reencoded), có độ phân giải thấp nhất là Full HD (1080p), trong khi hầu hết các trang phim khác chỉ có tới độ phân giải HD (720p) là cao nhất</li>
+                    <li>Chất lượng cao, lượng dữ liệu trên giây (bitrate) gấp từ 5 - 10 lần phim online thông thường - đây là yếu tố quyết định độ nét của phim (thậm chí còn quan trọng hơn độ phân giải)</li>
+                    <li>Âm thanh 5.1 (6 channel) thay vì stereo (2 channel) như các trang phim khác (kể cả Youtube)</li>
+                    <li>Phù hợp để xem trên màn hình TV, máy tính, laptop có độ phân giải cao</li>
+                    <li>Nếu không hài lòng với phụ đề có sẵn, bạn có thể tự upload phụ đề của riêng mình để xem online</li>
+                    <li>Có lựa chọn hiện phụ đề song ngữ (tức hiện đồng thời cả tiếng Anh & tiếng Việt), phù hợp với những người muốn học tiếng Anh qua phụ đề phim</li>
+                </ul>
+            </ul>
+
+        </div>
+    </div>
+</div>
+
+</section>
+</body>
+</html>
+
+
+

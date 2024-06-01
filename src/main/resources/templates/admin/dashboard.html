@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+        }
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: #1f1f1f;
+            padding: 20px;
+            position: fixed;
+            transition: width 0.3s, padding 0.3s;
+            overflow: hidden;
+        }
+        .sidebar.closed {
+            width: 70px;
+            padding: 20px 10px;
+        }
+        .sidebar.closed .sidebar-content {
+            display: none;
+        }
+        .sidebar h2 {
+            font-size: 1.5em;
+            margin-bottom: 1em;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar ul li {
+            margin: 20px 0;
+        }
+       .sidebar ul li a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 1.8em;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s; /* Add transition for smooth animation */
+}
+
+.sidebar ul li a:hover {
+    background-color: #333; /* Change to your desired hover background color */
+    transform: scale(1.1); /* Increase the size on hover */
+}
+        .sidebar ul li a i {
+            margin-right: 10px;
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 80px;
+            flex-grow: 1;
+            transition: margin-left 0.3s;
+        }
+        .main-content.closed {
+            margin-left: 70px;
+        }
+        .toggle-btn {
+            background-color: #ff5722;
+            border: none;
+            color: #ffffff;
+            padding: 10px 20px;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            left: 250px;
+            transition: left 0.3s;
+            font-size: 1.5em;
+        }
+        .toggle-btn.closed {
+            left: 70px;
+        }
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+        .card {
+            background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .card h3 {
+            margin-top: 0;
+        }
+       
+    </style>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-content">
+            <a class="navbar-brand" href="/movies" style="font-size: 1.5em; background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #0000ff, #ff00ff, #00ffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                MovieAI
+            </a>
+            <ul>
+                <li><a onclick="showSection('home')"><i class="fas fa-home"></i>Home</a></li>
+                <li><a onclick="showSection('profile')"><i class="fas fa-user"></i>Profiles</a></li>
+                <li><a onclick="showSection('movies')"><i class="fas fa-film"></i>Movies</a></li>
+                <li><a onclick="showSection('comments')"><i class="fas fa-comments"></i>Comments</a></li>
+            </ul>
+        </div>
+    </div>
+    <button class="toggle-btn" id="toggle-btn"><i class="fas fa-bars"></i></button>
+    <div class="main-content" id="main-content">
+        <div id="home" class="section active">
+            <h1>Dashboard</h1>
+            <div class="card">
+                <h3>Total Films</h3>
+                <p>1234</p>
+            </div>
+            <div class="card">
+                <h3>Total Users</h3>
+                <p>5678</p>
+            </div>
+        </div>
+   <div id="profile" class="section">
+    <h1>Users</h1>
+     <button class="create-btn">Create User</button>
+    <!-- Table to display user data -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- User data rows will be dynamically populated here -->
+            <tr>
+                <td>1</td>
+                <td>John Doe</td>
+                <td>john.doe@example.com</td>
+                <td>
+                    <!-- Edit button -->
+                    <button>Edit</button>
+                    <!-- Delete button -->
+                    <button>Delete</button>
+                </td>
+            </tr>
+            <!-- Repeat this row structure for each user -->
+        </tbody>
+    </table>
+    <!-- Create button for adding a new user -->
+   
+</div>
+
+<div id="movies" class="section">
+    <h1>Movies</h1>
+    <button class="create-btn">Create Movie</button>
+    <!-- Table to display movie data -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Genre</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Movie data rows will be dynamically populated here -->
+            <tr>
+                <td>1</td>
+                <td>The Shawshank Redemption</td>
+                <td>Drama</td>
+                <td>
+                    <!-- Edit button -->
+                    <button>Edit</button>
+                    <!-- Delete button -->
+                    <button>Delete</button>
+                </td>
+            </tr>
+            <!-- Repeat this row structure for each movie -->
+        </tbody>
+    </table>
+    <!-- Create button for adding a new movie -->
+    
+</div>
+
+<div id="comments" class="section">
+    <h1>Comments</h1>
+    <button class="create-btn">Create Comment</button>
+    <!-- Table to display comments -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Movie</th>
+                <th>Comment</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Comment data rows will be dynamically populated here -->
+            <tr>
+                <td>1</td>
+                <td>John Doe</td>
+                <td>The Shawshank Redemption</td>
+                <td>This movie is amazing!</td>
+                <td>
+                    <!-- Edit button -->
+                    <button>Edit</button>
+                    <!-- Delete button -->
+                    <button>Delete</button>
+                </td>
+            </tr>
+            <!-- Repeat this row structure for each comment -->
+        </tbody>
+    </table>
+    <!-- Create button for adding a new comment -->
+    
+</div>
+
+    </div>
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('toggle-btn');
+        const mainContent = document.getElementById('main-content');
+
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('closed');
+            mainContent.classList.toggle('closed');
+            toggleBtn.classList.toggle('closed');
+        });
+
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                if (section.id === sectionId) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
