@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder; // Inject PasswordEncoder
+    private PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -28,8 +28,8 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setUsername(userDto.getUsername());
         user.setEmail(userDto.getEmail());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword())); // Encrypt password
-        user.setRole(userDto.getRole()); // Set role from userDto
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setRole(userDto.getRole());
         user.setJoinDate(LocalDateTime.now());
 
         return userRepository.save(user);
@@ -38,16 +38,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean authenticateUser(String username, String password) {
         User user = userRepository.findByUsername(username);
-        return user != null && passwordEncoder.matches(password, user.getPassword()); // Compare encrypted passwords
+        return user != null && passwordEncoder.matches(password, user.getPassword());
     }
-    
+
     @Override
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
-    
-    
+    @Override
+    public User getUserByUsernameWithFavorites(String username) {
+        return userRepository.findByUsernameWithFavorites(username);
+    }
+
     @Override
     public User getUserById(int id) {
         return userRepository.findById(id).orElse(null);
@@ -60,9 +63,9 @@ public class UserServiceImpl implements UserService {
             user.setUsername(userDto.getUsername());
             user.setEmail(userDto.getEmail());
             if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
-                user.setPassword(passwordEncoder.encode(userDto.getPassword())); // Encrypt password if it's updated
+                user.setPassword(passwordEncoder.encode(userDto.getPassword()));
             }
-            user.setRole(userDto.getRole()); // Set role from userDto
+            user.setRole(userDto.getRole());
             userRepository.save(user);
         }
         return user;
@@ -77,6 +80,4 @@ public class UserServiceImpl implements UserService {
     public List<User> findAllUsers() {
         return userRepository.findAll();
     }
-    
-    
 }

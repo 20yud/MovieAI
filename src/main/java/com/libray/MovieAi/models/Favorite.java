@@ -1,39 +1,50 @@
 package com.libray.MovieAi.models;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Favorites")
+@Table(name = "favorites")
 public class Favorite {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private int id;
+    private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "movie_id", nullable = false)
+    @JoinColumn(name = "movie_id")
     private Movie movie;
 
-    @Column(name = "favorite_date", nullable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "favorite_date")
     private LocalDateTime favoriteDate;
 
     // Constructors
     public Favorite() {
-        this.favoriteDate = LocalDateTime.now(); // Initialize favoriteDate with the current timestamp
     }
 
-    // Getters and Setters
-    public int getId() {
+    public Favorite(User user, Movie movie) {
+        this.user = user;
+        this.movie = movie;
+        this.favoriteDate = LocalDateTime.now();
+    }
+
+    // Getters and setters
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

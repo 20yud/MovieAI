@@ -1,9 +1,8 @@
 package com.libray.MovieAi.models;
 
-
-
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "Users")
@@ -28,6 +27,9 @@ public class User {
 
     @Column(name = "join_date", nullable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime joinDate;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<Favorite> favorites;
 
     // Constructors
     public User() {
@@ -82,5 +84,12 @@ public class User {
     public void setJoinDate(LocalDateTime joinDate) {
         this.joinDate = joinDate;
     }
-}
 
+    public List<Favorite> getFavorites() {
+        return favorites;
+    }
+
+    public void setFavorites(List<Favorite> favorites) {
+        this.favorites = favorites;
+    }
+}

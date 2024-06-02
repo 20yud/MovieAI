@@ -1,5 +1,7 @@
 package com.libray.MovieAi.controllers;
 
+
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
@@ -66,15 +68,26 @@ public class HomeController {
         // Fetch all genres
         List<Genre> genres = genresRepository.findAll();
         model.addAttribute("genres", genres);
-        
-     // Fetch distinct release years
+
+        // Fetch distinct release years
         List<Integer> releaseYears = repo.findDistinctReleaseYears();
         model.addAttribute("releaseYears", releaseYears);
 
+        // Add user profile information if authenticated
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
+            String username = auth.getName(); // Get username of logged-in user
+            User user = userService.getUserByUsername(username); // Assuming you have a method to retrieve user by username
+            model.addAttribute("user", user);
+        } else {
+            model.addAttribute("user", null);
+        }
 
-
-        return "/index";
+        return "index";
     }
+
+    
+
 
     @GetMapping("/login")
     public String loginForm() {
@@ -86,14 +99,7 @@ public class HomeController {
         return "home";
     }
     
-    @GetMapping("/profile")
-    public String userProfile(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName(); // Get username of logged-in user
-        User user = userService.getUserByUsername(username); // Assuming you have a method to retrieve user by username
-        model.addAttribute("user", user);
-        return "profile";
-    }
+    
     
     @PostMapping("/login")
     public String loginUser(@RequestParam("username") String username, 

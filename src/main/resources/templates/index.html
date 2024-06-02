@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="base::Layout(~{::section})">
 <head>
     <meta charset="ISO-8859-1">
-    <title>Insert title here</title>
+    <title>Trang Chủ</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" 
     integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" 
     crossorigin="anonymous">
@@ -35,44 +35,57 @@
             <!-- Parent container for filter bar and movie cards -->
             <div class="movie-container">
                 <!-- Filter bar -->
-                <div class="filter-bar">
-                    <form>
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                <label for="inputType" class="form-label">Loại phim:</label>
-                                <select id="inputType" class="form-select">
-                                    <option selected>Tất cả</option>
-                                    <option>Phim lẻ</option>
-                                    <!-- Add other options here -->
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="inputGenre" class="form-label">Thể loại:</label>
-                                <select id="inputGenre" class="form-select">
-                                    <option selected>Tất cả</option>
-                                    <option th:each="genre : ${genres}" th:value="${genre.id}" th:text="${genre.name}"></option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="inputYear" class="form-label">Năm:</label>
-                                <select id="inputYear" class="form-select">
-                                    <option selected>Tất cả</option>
-                                    <option th:each="year : ${releaseYears}" th:text="${year}" th:value="${year}"></option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="inputDuration" class="form-label">Thời lượng:</label>
-                                <select id="inputDuration" class="form-select">
-                                    <option selected>Tất cả</option>
-                                    <option>>90p</option>
-                                    <option><90p</option>
-                                    <!-- Add other options here -->
-                                </select>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+<div class="filter-bar">
+    <form id="filterForm" action="/filter" method="get">
+        <div class="row g-3">
+        <div class="col-md-3">
+                <label class="form-label">Phim:</label>
+                <select   class="form-select">
+                    <option value="" selected>Phim Lẻ</option>
+                   
+                </select>
             </div>
+            <div class="col-md-3">
+                <label for="inputGenre" class="form-label">Thể loại:</label>
+                <select id="inputGenre" name="genre" class="form-select">
+                    <option value="" selected>Tất cả</option>
+                    <option th:each="genre : ${genres}" th:value="${genre.id}" th:text="${genre.name}"></option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="inputYear" class="form-label">Năm:</label>
+                <select id="inputYear" name="year" class="form-select">
+                    <option value="" selected>Tất cả</option>
+                    <option th:each="year : ${releaseYears}" th:text="${year}" th:value="${year}"></option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="inputDuration" class="form-label">Thời lượng:</label>
+                <select id="inputDuration" name="duration" class="form-select">
+                    <option value="" selected>Tất cả</option>
+                    <option value=">90p">>90 phút</option>
+                    <option value="<90p"><90 phút</option>
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Select the form element
+        var filterForm = document.getElementById("filterForm");
+
+        // Add change event listener to the form
+        filterForm.addEventListener("change", function() {
+            // Submit the form when any select element changes
+            filterForm.submit();
+        });
+    });
+</script>
+
+
+
             
             <!-- Top Favorite Film Section -->
             <div class="text-start text-yellow-dark ps-3">
@@ -138,10 +151,7 @@
                 </nav>
             </div>
         </main>
-    </section>
-    
-</body>
-
+        
 <script>
 //Function to get URL parameter
 function getUrlParameter(name) {
@@ -245,6 +255,10 @@ async function renderMovieCards(movies) {
 }
 
     </script>
+    </section>
+    
+</body>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     </body>

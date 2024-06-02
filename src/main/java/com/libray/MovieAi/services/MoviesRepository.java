@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import com.libray.MovieAi.models.Genre;
 import com.libray.MovieAi.models.Movie;
 
 @Repository
@@ -42,5 +44,34 @@ public interface MoviesRepository extends JpaRepository<Movie, Integer> {
 	    @Query(value = "SELECT DISTINCT YEAR(STR_TO_DATE(release_date, '%m/%d/%Y')) as year FROM Movies WHERE release_date IS NOT NULL ORDER BY year DESC", nativeQuery = true)
 	    List<Integer> findDistinctReleaseYears();
     
+	    @Query(value = "SELECT * FROM Movies WHERE genre = :genre", nativeQuery = true)
+	    List<Movie> findByGenre(@Param("genre") String genre);
+	    
+	    @Query(value = "SELECT * FROM Movies WHERE genre = :genre LIMIT :limit OFFSET :offset", nativeQuery = true)
+	    List<Movie> findMoviesByGenre(@Param("genre") String genre, @Param("limit") int limit, @Param("offset") int offset);
+
+	    @Query(value = "SELECT COUNT(*) FROM Movies WHERE genre = :genre", nativeQuery = true)
+	    int countMoviesByGenre(@Param("genre") String genre);
+
+	    @Query(value = "SELECT * FROM Movies WHERE YEAR(STR_TO_DATE(release_date, '%m/%d/%Y')) = :year LIMIT :limit OFFSET :offset", nativeQuery = true)
+	    List<Movie> findMoviesByYear(@Param("year") int year, @Param("limit") int limit, @Param("offset") int offset);
+
+	    @Query(value = "SELECT COUNT(*) FROM Movies WHERE YEAR(STR_TO_DATE(release_date, '%m/%d/%Y')) = :year", nativeQuery = true)
+	    int countMoviesByYear(@Param("year") int year);
+
+	    @Query(value = "SELECT * FROM Movies WHERE CAST(runtime AS UNSIGNED) > :runtime LIMIT :limit OFFSET :offset", nativeQuery = true)
+	    List<Movie> findMoviesByRuntime(@Param("runtime") int runtime, @Param("limit") int limit, @Param("offset") int offset);
+
+	    @Query(value = "SELECT COUNT(*) FROM Movies WHERE CAST(runtime AS UNSIGNED) > :runtime", nativeQuery = true)
+	    int countMoviesByRuntime(@Param("runtime") int runtime);
+
+	    @Query(value = "SELECT * FROM Movies WHERE YEAR(STR_TO_DATE(release_date, '%m/%d/%Y')) > :year AND CAST(runtime AS UNSIGNED) > :runtime AND genre = :genre LIMIT :limit OFFSET :offset", nativeQuery = true)
+	    List<Movie> findMoviesByRuntimeYearAndGenre(@Param("runtime") int runtime, @Param("year") int year, @Param("genre") String genre, @Param("limit") int limit, @Param("offset") int offset);
+
+	    @Query(value = "SELECT COUNT(*) FROM Movies WHERE YEAR(STR_TO_DATE(release_date, '%m/%d/%Y')) > :year AND CAST(runtime AS UNSIGNED) > :runtime AND genre = :genre", nativeQuery = true)
+	    int countMoviesByRuntimeYearAndGenre(@Param("runtime") int runtime, @Param("year") int year, @Param("genre") String genre);
+
+
+	    
     
 }

@@ -21,36 +21,81 @@ th:replace="base::Layout(~{::section})">
         </div>
         <div class="col-md-7">
             <!-- Movie Title -->
-       <h2 th:text="${movie.originalTitle}" class="fw-bold mb-3" style="color: #FFD700;"></h2>
+            <h2 th:text="${movie.originalTitle}" class="fw-bold mb-3" style="color: #FFD700;"></h2>
 
             <!-- Movie Description -->
             <p th:text="${movie.overview}" class="lead"></p>
             <!-- Details -->
-            
-           
             <p><strong>Ngày ra mắt:</strong> <span th:text="${movie.releaseDate}"></span></p>
-            
-            
-   <p><strong>Thời Lượng:</strong> <span th:text="${T(com.libray.MovieAi.utils.TimeUtil).formatRuntime(movie.runtime)}"></span></p>
-
-
-
+            <p><strong>Thời Lượng:</strong> <span th:text="${T(com.libray.MovieAi.utils.TimeUtil).formatRuntime(movie.runtime)}"></span></p>
             <p><strong>Điểm đánh giá:</strong> <span th:text="${movie.voteAverage}"></span></p>
-           
-
-    
-    <p><strong>Type:</strong> 
-        <span th:each="genre, iterStat : ${genres}">
-            <span th:text="${genre.name}"></span>
-            <span th:if="${!iterStat.last}">,</span>
-        </span>
-    </p>
+            <p><strong>Type:</strong>
+                <span th:each="genre, iterStat : ${genres}">
+                    <span th:text="${genre.name}"></span>
+                    <span th:if="${!iterStat.last}">,</span>
+                </span>
+            </p>
 
             <!-- Back Button -->
-           <div class="d-grid mt-3" style="margin-top:50px;">
-    <a th:href="@{'/movies/watch/' + ${movie.id}}"  class="btn btn-lg btn-danger">Xem Phim</a>
+            <div class="d-grid mt-3" style="margin-top:50px;">
+                <a th:href="@{'/movies/watch/' + ${movie.id}}" class="btn btn-lg btn-danger">Xem Phim</a>
+            </div>
+<!-- Add to Favorites Button -->
+<div class="d-grid mt-3">
+    <button id="likeButton" class="btn btn-lg btn-success">Like</button>
+    <button id="unlikeButton" class="btn btn-lg btn-secondary">Unlike</button>
+    <input type="hidden" id="movieId" th:value="${movie.id}">
 </div>
 
+<script>
+    // Wait for the DOM to fully load before executing the script
+    document.addEventListener('DOMContentLoaded', function() {
+        // Debug statement to print movie.id
+        var movieId = document.getElementById('movieId').value;
+        console.log("Movie ID:", movieId);
+
+        document.getElementById('likeButton').addEventListener('click', function() {
+            fetch('/favorites/like/' + movieId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data); // Alert the response message
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        document.getElementById('unlikeButton').addEventListener('click', function() {
+            fetch('/favorites/unlike/' + movieId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data); // Alert the response message
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    });
+</script>
+
+        </div>
+    </div>
+</div>
+
+
+ 
 
 
         </div>
@@ -60,7 +105,17 @@ th:replace="base::Layout(~{::section})">
 <div class="container mt-4">
     <h3>Maybe You Like</h3>
     <div class="row" id="maybeYouLikeMovies">
-        <!-- Movies will be dynamically added here -->
+        <!-- Loop through recommended movies and display them -->
+        <div th:each="movie : ${recommendedMovies}" class="col-md-2">
+            <a th:href="@{'/movies/detail/' + ${movie.id}}" class="text-decoration-none text-light">
+                <div class="card">
+                    <img th:src="@{'/images/posters' + ${movie.posterPath} + '.jpg'}" class="card-img-top" alt="Movie Poster">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${movie.originalTitle}"></h5>
+                    </div>
+                </div>
+            </a>
+        </div>
     </div>
 </div>
 
