@@ -91,7 +91,7 @@ public class MovieController {
         
         // Call the Flask API to get similar movies
         RestTemplate restTemplate = new RestTemplate();
-        String apiUrl = "http://localhost:5555/api?id=" + id;
+        String apiUrl = "http://localhost:5555/api/overview-suggest?id=" + id;
         
         try {
             Map<String, Object> response = restTemplate.getForObject(apiUrl, Map.class);
@@ -107,7 +107,21 @@ public class MovieController {
             e.printStackTrace();
             model.addAttribute("recommendedMovies", List.of()); // Add an empty list if there is an error
         }
-        
+        String genreApiUrl = "http://localhost:5555/api/genre-suggest?id=" + id;
+        try {
+            Map<String, Object> genreResponse = restTemplate.getForObject(genreApiUrl, Map.class);
+            if (genreResponse != null && genreResponse.containsKey("recommended_movies")) {
+                List<Map<String, Object>> genreRecommendedMovies = (List<Map<String, Object>>) genreResponse.get("recommended_movies");
+                System.out.println("Genre-based Recommended Movies: " + genreRecommendedMovies);
+                model.addAttribute("genreRecommendedMovies", genreRecommendedMovies);
+            } else {
+                System.out.println("No genre-based recommended movies found in the response.");
+                model.addAttribute("genreRecommendedMovies", List.of()); // Add an empty list if no recommendations
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("genreRecommendedMovies", List.of()); // Add an empty list if there is an error
+        }
         model.addAttribute("movie", movie);
         model.addAttribute("genres", genres);
         return "movies/detailMovie";

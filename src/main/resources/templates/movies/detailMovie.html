@@ -103,7 +103,7 @@ th:replace="base::Layout(~{::section})">
 </div>
 <!-- Maybe You Like Section -->
 <div class="container mt-4">
-    <h3>Maybe You Like</h3>
+    <h3>Phim Đề Cử</h3>
     <div class="row" id="maybeYouLikeMovies">
         <!-- Loop through recommended movies and display them -->
         <div th:each="movie : ${recommendedMovies}" class="col-md-2">
@@ -118,6 +118,25 @@ th:replace="base::Layout(~{::section})">
         </div>
     </div>
 </div>
+
+<!-- Maybe You Like Section 2 -->
+<div class="container mt-4">
+    <h3>Các Phim Có Cùng Thể Loại</h3>
+    <div class="row" id="maybeYouLikeMoviesByGenre">
+        <!-- Loop through genre-based recommended movies and display them -->
+        <div th:each="genreMovie : ${genreRecommendedMovies}" class="col-md-2">
+            <a th:href="@{'/movies/detail/' + ${genreMovie.id}}" class="text-decoration-none text-light">
+                <div class="card">
+                    <img th:src="@{'/images/posters' + ${genreMovie.posterPath} + '.jpg'}" class="card-img-top" alt="Movie Poster">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${genreMovie.originalTitle}"></h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
 
 <!-- Comment Section -->
 <div class="container mt-4">
