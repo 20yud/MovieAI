@@ -39,106 +39,106 @@ th:replace="base::Layout(~{::section})">
     </main>
     
     <script>
-//Function to get URL parameter
-function getUrlParameter(name) {
-    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-    var results = regex.exec(location.search);
-    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-}
-
-// Function to dynamically generate pagination links
-function generatePagination(currentPage, totalPages) {
-    var paginationElement = document.getElementById('pagination');
-    paginationElement.innerHTML = ''; // Clear existing pagination links
-
-    // Add Previous page link
-    paginationElement.innerHTML += `<li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                        <a class="page-link" href="?page=${currentPage - 1}" aria-label="Previous">
-                                            <span aria-hidden="true">&laquo;</span>
-                                        </a>
-                                    </li>`;
-
-    // Calculate start and end page numbers
-    var startPage, endPage;
-    if (totalPages <= 5) {
-        startPage = 1;
-        endPage = totalPages;
-    } else if (currentPage <= 3) {
-        startPage = 1;
-        endPage = 5;
-    } else if (currentPage + 2 >= totalPages) {
-        startPage = totalPages - 4;
-        endPage = totalPages;
-    } else {
-        startPage = currentPage - 2;
-        endPage = currentPage + 2;
+ // Function to get URL parameter
+    function getUrlParameter(name) {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(location.search);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     }
 
-    // Add individual page links
-    for (var i = startPage; i <= endPage; i++) {
-        paginationElement.innerHTML += `<li class="page-item ${i == currentPage ? 'active' : ''}">
-                                            <a class="page-link" href="?page=${i}">${i}</a>
+    // Function to dynamically generate pagination links
+    function generatePagination(currentPage, totalPages, queryParams) {
+        var paginationElement = document.getElementById('pagination');
+        paginationElement.innerHTML = ''; // Clear existing pagination links
+
+        // Add Previous page link
+        paginationElement.innerHTML += `<li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                            <a class="page-link" href="?page=${currentPage - 1}${queryParams}" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>`;
+
+        // Calculate start and end page numbers
+        var startPage, endPage;
+        if (totalPages <= 5) {
+            startPage = 1;
+            endPage = totalPages;
+        } else if (currentPage <= 3) {
+            startPage = 1;
+            endPage = 5;
+        } else if (currentPage + 2 >= totalPages) {
+            startPage = totalPages - 4;
+            endPage = totalPages;
+        } else {
+            startPage = currentPage - 2;
+            endPage = currentPage + 2;
+        }
+
+        // Add individual page links
+        for (var i = startPage; i <= endPage; i++) {
+            paginationElement.innerHTML += `<li class="page-item ${i == currentPage ? 'active' : ''}">
+                                                <a class="page-link" href="?page=${i}${queryParams}">${i}</a>
+                                            </li>`;
+        }
+
+        // Add Next page link
+        paginationElement.innerHTML += `<li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                            <a class="page-link" href="?page=${currentPage + 1}${queryParams}" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
                                         </li>`;
     }
 
-    // Add Next page link
-    paginationElement.innerHTML += `<li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                        <a class="page-link" href="?page=${currentPage + 1}" aria-label="Next">
-                                            <span aria-hidden="true">&raquo;</span>
-                                        </a>
-                                    </li>`;
-}
+    // Call the function to generate pagination links when the page loads
+    window.onload = function() {
+        var currentPage = parseInt(getUrlParameter('page')) || 1; // Get current page from URL or default to 1
+        var totalPages = parseInt(document.getElementById('totalPages').value); // Get total pages from hidden field
+        var queryParams = location.search.replace(/&?page=\d+/, ''); // Get query params excluding the page parameter
+        generatePagination(currentPage, totalPages, queryParams);
+    };
 
-// Call the function to generate pagination links when the page loads
-window.onload = function() {
-    var currentPage = parseInt(getUrlParameter('page')) || 1; // Get current page from URL or default to 1
-    var totalPages = parseInt(document.getElementById('totalPages').value); // Get total pages from hidden field
-    generatePagination(currentPage, totalPages);
-};
-
-
-async function handleSearch(event) {
-    event.preventDefault(); // Prevents the default form submission behavior
-    const searchInput = document.getElementById('searchInput').value;
-    const filteredMovies = await fetchMovies(searchInput);
-    renderMovieCards(filteredMovies);
-}
-
-async function fetchMovies(searchQuery = '') {
-    try {
-        const response = await fetch(`/movies?searchQuery=${searchQuery}`);
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error fetching movies:', error);
+    async function handleSearch(event) {
+        event.preventDefault(); // Prevents the default form submission behavior
+        const searchInput = document.getElementById('searchInput').value;
+        const filteredMovies = await fetchMovies(searchInput);
+        renderMovieCards(filteredMovies);
     }
-}
 
-async function renderMovieCards(movies) {
-    const movieCardsContainer = document.getElementById('movieCards');
-    // Clear previous movie cards
-    movieCardsContainer.innerHTML = '';
-    // Loop through the first 20 movies or less if there are fewer than 20 movies
-    for (let i = 0; i < Math.min(20, movies.length); i++) {
-        const movie = movies[i];
-        const card = document.createElement('div');
-        card.classList.add('col-md-3'); // Adjust the column width
-        card.innerHTML = `
-            <div class="card">
-                <a href="/movies/detail/${movie.id}">
-                    <img src="/images/${movie.imageFileName}" class="card-img-top" alt="Movie Image">
-                </a>
-                <div class="card-body">
-                    <h5 class="card-title">${movie.title}</h5>
-                    <p class="card-text">${movie.description}</p>
-                    <a href="/movies/detail/${movie.id}" class="btn btn-primary">View Details</a>
+    async function fetchMovies(searchQuery = '', page = 1) {
+        try {
+            const response = await fetch(`/movies?searchQuery=${searchQuery}&page=${page}`);
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching movies:', error);
+        }
+    }
+
+    async function renderMovieCards(movies) {
+        const movieCardsContainer = document.getElementById('movieCards');
+        // Clear previous movie cards
+        movieCardsContainer.innerHTML = '';
+        // Loop through the movies and create cards
+        movies.forEach(movie => {
+            const card = document.createElement('div');
+            card.classList.add('col-md-3'); // Adjust the column width
+            card.innerHTML = `
+                <div class="card">
+                    <a href="/movies/detail/${movie.id}">
+                        <img src="/images/${movie.imageFileName}" class="card-img-top" alt="Movie Image">
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title">${movie.title}</h5>
+                        <p class="card-text">${movie.description}</p>
+                        <a href="/movies/detail/${movie.id}" class="btn btn-primary">View Details</a>
+                    </div>
                 </div>
-            </div>
-        `;
-        movieCardsContainer.appendChild(card);
+            `;
+            movieCardsContainer.appendChild(card);
+        });
     }
-}
+
 
     </script>
 </section>

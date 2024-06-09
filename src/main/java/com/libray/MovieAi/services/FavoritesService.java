@@ -2,10 +2,10 @@ package com.libray.MovieAi.services;
 
 
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.libray.MovieAi.models.Favorite;
 import com.libray.MovieAi.models.Movie;
@@ -25,9 +25,17 @@ public class FavoritesService {
         favoritesRepository.save(favorite);
     }
 
+    @Transactional
     public void removeFavorite(User user, Movie movie) {
+        // Find the favorite based on user_id and movie_id
         Optional<Favorite> favorite = favoritesRepository.findByUserAndMovie(user, movie);
-        favorite.ifPresent(favoritesRepository::delete);
+        favorite.ifPresent(f -> {
+            Integer favoriteId = f.getId();
+            System.out.println("Favorite ID to be removed: " + favoriteId); // Print the ID before deletion
+            // Delete the favorite by its id
+            favoritesRepository.deleteById(favoriteId);
+            System.out.println("Favorite removed successfully.");
+        });
     }
 
     public boolean isFavorite(User user, Movie movie) {

@@ -15,4 +15,5 @@ public interface UserService {
 	    boolean authenticateUser(String username, String password);
 	    User getUserByUsername(String username);
 	    User getUserByUsernameWithFavorites(String username);  // Add this method
+	    
 }

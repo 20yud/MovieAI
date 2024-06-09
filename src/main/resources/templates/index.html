@@ -36,13 +36,12 @@
             <div class="movie-container">
                 <!-- Filter bar -->
 <div class="filter-bar">
-    <form id="filterForm" action="/filter" method="get">
+    <form id="filterForm" action="/movies/filter" method="get">
         <div class="row g-3">
-        <div class="col-md-3">
+            <div class="col-md-3">
                 <label class="form-label">Phim:</label>
-                <select   class="form-select">
+                <select id="inputType" name="type" class="form-select">
                     <option value="" selected>Phim Lẻ</option>
-                   
                 </select>
             </div>
             <div class="col-md-3">
@@ -73,13 +72,23 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Select the form element
         var filterForm = document.getElementById("filterForm");
+        var selects = filterForm.querySelectorAll("select");
 
-        // Add change event listener to the form
-        filterForm.addEventListener("change", function() {
-            // Submit the form when any select element changes
-            filterForm.submit();
+        selects.forEach(function(select) {
+            select.addEventListener("change", function() {
+                // Reset other select elements except the current one
+                selects.forEach(function(otherSelect) {
+                    if (otherSelect !== select) {
+                        otherSelect.selectedIndex = 0;
+                        otherSelect.name = ""; // Remove the name attribute
+                    } else {
+                        otherSelect.name = otherSelect.id.replace("input", "").toLowerCase(); // Set name attribute
+                    }
+                });
+                // Submit the form
+                filterForm.submit();
+            });
         });
     });
 </script>

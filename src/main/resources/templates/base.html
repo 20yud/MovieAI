@@ -62,36 +62,37 @@ th:fragment="Layout(content)">
                     <a class="nav-link" href="/movies/faq">FAQ</a>
                 </li>
                 <li class="nav-item">
-    <a class="nav-link" href="/movies/search">Tìm Kiếm</a>
+    <a class="nav-link" href="/movies/search">Tìm Kiếm</a>	
     
-     
-        <li class="nav-item">
-                    <a class="nav-link" href="/movies/filter">test</a>
-                </li>
-		</li>
            </ul>
            
            
            
 <div class="dropdown">
-        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-chevron-down"></i>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-            <li th:if="${user == null}">
-                <a class="dropdown-item" href="/login">Đăng Nhập</a>
-            </li>
-            <li th:if="${user == null}">
-                <a class="dropdown-item" href="/register">Đăng Kí</a>
-            </li>
-            <li th:if="${user != null}">
-                <a class="dropdown-item" href="/users/profile">Thông Tin</a>
-            </li>
-            <li th:if="${user != null}">
-                <a class="dropdown-item" href="logout">Đăng Xuất</a>
-            </li>
-        </ul>
-    </div>
+    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fas fa-chevron-down"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+        <li th:if="${user == null}">
+            <a class="dropdown-item" href="/login">Đăng Nhập</a>
+        </li>
+        <li th:if="${user == null}">
+            <a class="dropdown-item" href="/register">Đăng Kí</a>
+        </li>
+        <li th:if="${user != null}">
+            <a class="dropdown-item" href="/users/profile">Thông Tin</a>
+        </li>
+         <!-- Conditionally show the "Quản lí" button if user role is admin -->
+        <li th:if="${user != null and user.role == 'ADMIN'}">
+            <a class="dropdown-item" href="/admin/test">Quản lí</a>
+        </li>
+        <li th:if="${user != null}">
+            <a class="dropdown-item" href="logout">Đăng Xuất</a>
+        </li>
+       
+    </ul>
+</div>
+
 </nav>
 
 	<div th:replace="${content}"></div>

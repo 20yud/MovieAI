@@ -103,7 +103,7 @@ th:replace="base::Layout(~{::section})">
 </div>
 <!-- Maybe You Like Section -->
 <div class="container mt-4">
-    <h3>Phim Đề Cử</h3>
+    <h3 style="color: #FFD700;">Phim Đề Cử</h3>
     <div class="row" id="maybeYouLikeMovies">
         <!-- Loop through recommended movies and display them -->
         <div th:each="movie : ${recommendedMovies}" class="col-md-2">
@@ -121,7 +121,7 @@ th:replace="base::Layout(~{::section})">
 
 <!-- Maybe You Like Section 2 -->
 <div class="container mt-4">
-    <h3>Các Phim Có Cùng Thể Loại</h3>
+    <h3 style="color: #FFD700;">Các Phim Có Cùng Thể Loại</h3>
     <div class="row" id="maybeYouLikeMoviesByGenre">
         <!-- Loop through genre-based recommended movies and display them -->
         <div th:each="genreMovie : ${genreRecommendedMovies}" class="col-md-2">
@@ -136,18 +136,16 @@ th:replace="base::Layout(~{::section})">
         </div>
     </div>
 </div>
-
-
 <!-- Comment Section -->
 <div class="container mt-4">
-    <h3>Bình Luận</h3>
-    <!-- Historical comments -->
-    <div class="mb-3">
-       
-        <ul id="historicalComments">
-            <!-- Historical comments will be dynamically added here -->
-        </ul>
-    </div>
+    
+<div class="mb-3">
+    <h3 style="color: #FFD700;">Các Lượt Bình Luận</h3>
+    <ul id="historicalComments">
+      
+    </ul>
+</div>
+
     <!-- New Comment Form -->
     <div class="mb-3">
         <h5>Thêm Bình Luận</h5>
@@ -156,15 +154,102 @@ th:replace="base::Layout(~{::section})">
                 <label for="comment" class="form-label">Nội Dung:</label>
                 <textarea class="form-control" id="comment" rows="3"></textarea>
             </div>
-           <div class="mb-3">
-    <label for="rating" class="form-label">Rating (1-10):</label>
-    <input type="number" class="form-control form-control-sm" id="rating" min="1" max="10" step="1">
-</div>
-
+            <div class="mb-3">
+                <label for="rating" class="form-label">Rating (1-10):</label>
+                <input type="number" class="form-control form-control-sm" id="rating" min="1" max="10" step="1">
+            </div>
             <button type="submit" class="btn btn-primary">Gửi</button>
+            <input type="hidden" id="movieId" value="1"> <!-- Set the movie ID here -->
         </form>
     </div>
 </div>
+
+
+<!-- JavaScript -->
+<!-- JavaScript -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Get movie ID from the hidden input field
+    let movieId = document.getElementById("movieId").value;
+
+    // Fetch comments for the movie
+    fetch(`/comments/fetchComments/${movieId}`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Failed to fetch comments: ${response.status} ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(comments => {
+        console.log("Fetched comments:", comments); // Log fetched comments for debugging
+        // Display comments on the page
+        let commentsList = document.getElementById("historicalComments");
+        commentsList.innerHTML = ""; // Clear previous comments
+
+        comments.forEach(comment => {
+            // Create HTML elements to display comment
+            let li = document.createElement("li");
+            // Check if user object is not null before accessing its properties
+            let username = comment.user ? comment.user.username : "Unknown User";
+            let commentDate = new Date(comment.commentDate).toLocaleString(); // Format comment date
+            li.textContent = `${username} (${commentDate}): ${comment.commentText}`;
+            commentsList.appendChild(li);
+        });
+    })
+    .catch(error => {
+        console.error("Error fetching comments:", error);
+    });
+
+    // Add event listener to the comment form
+    document.getElementById("commentForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        // Get values from the form
+        let commentText = document.getElementById("comment").value;
+        let rating = document.getElementById("rating").value;
+
+        // Display rating value in an alert
+        alert("Rating: " + rating);
+
+
+     // Create a new comment object
+        let commentData = {
+            commentText: commentText,
+            rating: rating, // Change 'ratingValue' to 'rating'
+            movieId: movieId
+        };
+
+
+        // Send the data to the backend
+        fetch("/comments", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(commentData)
+        })
+        .then(response => {
+            if (response.ok) {
+                // If the comment was added successfully, refresh the page to display the new comment
+                location.reload();
+            } else {
+                // Handle error
+                console.error("Error adding comment:", response.statusText);
+            }
+        })
+        .catch(error => {
+            console.error("Error adding comment:", error);
+        });
+    });
+});
+
+</script>
+
+
+
+
+
+
 </section>
  
 <!-- Bootstrap Bundle JS -->

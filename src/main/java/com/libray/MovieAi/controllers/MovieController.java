@@ -7,12 +7,16 @@ import com.libray.MovieAi.services.MovieService;
 import com.libray.MovieAi.services.MoviesRepository;
 import com.libray.MovieAi.services.UserService;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 @Configuration
@@ -130,49 +135,48 @@ public class MovieController {
 
     @GetMapping("/filter")
     public String filterMovies(Model model, @RequestParam(defaultValue = "1") int page,
-                               @RequestParam(required = false) String genre,
-                               @RequestParam(required = false) Integer year,
-                               @RequestParam(required = false) String duration) {
-        int limit = 60; // Number of movies per page
-        int offset = (page - 1) * limit; // Calculate offset based on the page number
+            @RequestParam(required = false) Integer genre,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) String duration) {
+int limit = 60; // Number of movies per page
+int offset = (page - 1) * limit; // Calculate offset based on the page number
 
-        int runtimeThreshold = 90; // Minimum runtime in minutes
-        int releaseYearThreshold = 2015; // Minimum release year
+List<Movie> movies;
+int totalMovies;
 
-        List<Movie> movies;
-        int totalMovies;
+if (genre != null) {
+movies = repo.findMoviesByGenre(genre, limit, offset);
+totalMovies = repo.countMoviesByGenre(genre);
+} else if (year != null) {
+movies = repo.findMoviesByYear(year, limit, offset);
+totalMovies = repo.countMoviesByYear(year);
+} else if (duration != null && !duration.isEmpty()) {
+// Extract the numeric value from the duration string
+int runtimeValue = Integer.parseInt(duration.replaceAll("[^0-9]", ""));
+// Determine whether the duration should be greater than or less than the specified value
+if (duration.startsWith(">")) {
+movies = repo.findMoviesByRuntimeGreaterThan(runtimeValue, limit, offset);
+totalMovies = repo.countMoviesByRuntimeGreaterThan(runtimeValue);
+} else if (duration.startsWith("<")) {
+movies = repo.findMoviesByRuntimeLessThan(runtimeValue, limit, offset);
+totalMovies = repo.countMoviesByRuntimeLessThan(runtimeValue);
+} else {
+// Default behavior if the duration format is incorrect
+movies = repo.findMovies(limit, offset);
+totalMovies = repo.countAllMovies();
+}
+} else {
+movies = repo.findMovies(limit, offset);
+totalMovies = repo.countAllMovies();
+}
 
-        // Check which parameter is not null and apply filtering accordingly
-        if (genre != null && !genre.isEmpty()) {
-            // Filter by genre
-            movies = repo.findMoviesByGenre(genre, limit, offset);
-            totalMovies = repo.countMoviesByGenre(genre);
-        } else if (year != null) {
-            // Filter by year
-            movies = repo.findMoviesByYear(year, limit, offset);
-            totalMovies = repo.countMoviesByYear(year);
-        } else if (duration != null && !duration.isEmpty()) {
-            // Filter by duration
-            int runtimeValue = Integer.parseInt(duration.substring(1, duration.length() - 1));
-            movies = repo.findMoviesByRuntime(runtimeValue, limit, offset);
-            totalMovies = repo.countMoviesByRuntime(runtimeValue);
-        } else {
-        	// Default filtering by runtime threshold and release year threshold
-        	movies = repo.findMoviesByRuntimeYearAndGenre(runtimeThreshold, releaseYearThreshold, genre, limit, offset);
-        	totalMovies = repo.countMoviesByRuntimeYearAndGenre(runtimeThreshold, releaseYearThreshold, genre);
+int totalPages = (int) Math.ceil((double) totalMovies / limit);
+model.addAttribute("filteredMovies", movies);
+model.addAttribute("currentPage", page);
+model.addAttribute("totalPages", totalPages);
 
-        }
-
-        int totalPages = (int) Math.ceil((double) totalMovies / limit);
-        model.addAttribute("filteredMovies", movies);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", totalPages);
-
-        return "movies/filter";
-    }
-
-
-
+return "movies/filter"; // Ensure this matches the actual template file
+}
 
 
    
@@ -186,7 +190,16 @@ public class MovieController {
     }
 
     @GetMapping("/faq")
-    public String showFAQPage() {
+    public String showFAQPage(Model model) {
+    	 // Add user profile information if authenticated
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
+            String username = auth.getName(); // Get username of logged-in user
+            User user = userService.getUserByUsername(username); // Assuming you have a method to retrieve user by username
+            model.addAttribute("user", user);
+        } else {
+            model.addAttribute("user", null);
+        }
         return "movies/faq";
     }
     
@@ -195,10 +208,20 @@ public class MovieController {
         List<Movie> searchResults = new ArrayList<>();
         if (query != null && !query.isEmpty()) {
             searchResults = repo.findByTitleContainingIgnoreCaseLimited(query);
+            
             // Limit the number of search results to 60
             if (searchResults.size() > 60) {
                 searchResults = searchResults.subList(0, 60);
             }
+        }
+        // Add user profile information if authenticated
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
+            String username = auth.getName(); // Get username of logged-in user
+            User user = userService.getUserByUsername(username); // Assuming you have a method to retrieve user by username
+            model.addAttribute("user", user);
+        } else {
+            model.addAttribute("user", null);
         }
         model.addAttribute("searchResults", searchResults);
         model.addAttribute("query", query); // Pass the query parameter to the view
@@ -207,16 +230,59 @@ public class MovieController {
 
     @GetMapping("/top")
     public String showTopMovies(Model model) {
-        List<Movie> topMovies = repo.findTopMoviesByVoteAverage(60); // Assuming 60 as the limit
+        List<Movie> topMovies = repo.findTopMoviesByVoteAverage(60);
+        // Add user profile information if authenticated
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
+            String username = auth.getName(); // Get username of logged-in user
+            User user = userService.getUserByUsername(username); // Assuming you have a method to retrieve user by username
+            model.addAttribute("user", user);
+        } else {
+            model.addAttribute("user", null);
+        }// Assuming 60 as the limit
         model.addAttribute("topMovies", topMovies);
         return "movies/topmovies";
     }
 
     @GetMapping("/newest")
     public String showNewestMovies(Model model) {
-        List<Movie> newestMovies = repo.findNewestMovies(60); // Assuming 60 as the limit
+        List<Movie> newestMovies = repo.findNewestMovies(60);
+        // Add user profile information if authenticated
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
+            String username = auth.getName(); // Get username of logged-in user
+            User user = userService.getUserByUsername(username); // Assuming you have a method to retrieve user by username
+            model.addAttribute("user", user);
+        } else {
+            model.addAttribute("user", null);
+        }// Assuming 60 as the limit
         model.addAttribute("newestMovies", newestMovies);
         return "movies/newestmovies";
     }
+    
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        // Perform logout
+        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+        logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
 
+        // Redirect to the login page or any other desired page after logout
+        return "redirect:/login";
+    }
+    
+    @GetMapping("/detail/logout")
+    public String logoutt(HttpServletRequest request, HttpServletResponse response) {
+        // Perform logout
+        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+        logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
+
+        // Redirect to the login page or any other desired page after logout
+        return "redirect:/login";
+    }
+    
+    
+  
 }
+    
+
+

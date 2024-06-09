@@ -1,26 +1,29 @@
 package com.libray.MovieAi.models;
 
+
+
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDateTime;
 
 public class RatingDto {
 
-    private int id; // Add the id field
+    private int id;
+    private int userId;
+    private int movieId;
+    
+    private User user; // Add this line
 
-    private int userId; // ID of the user who made the rating
+    @NotNull(message = "Rating is required")
+    @Min(value = 1, message = "Rating must be at least 1")
+    @Max(value = 10, message = "Rating must be at most 10")
+    private double rating;
 
-    private int movieId; // ID of the movie being rated
+    private LocalDateTime ratingDate;
 
-    @NotNull(message = "The rating is required")
-    @Min(value = 0, message = "The rating must be at least 0")
-    @Max(value = 10, message = "The rating must be at most 10")
-    private Double rating;
-
-    private LocalDateTime ratingDate; // Rating date
-
-    // Getters and Setters
+    // Getters and setters
     public int getId() {
         return id;
     }
@@ -45,11 +48,19 @@ public class RatingDto {
         this.movieId = movieId;
     }
 
-    public Double getRating() {
+    public User getUser() { // Add this getter
+        return user;
+    }
+
+    public void setUser(User user) { // Add this setter
+        this.user = user;
+    }
+
+    public double getRating() {
         return rating;
     }
 
-    public void setRating(Double rating) {
+    public void setRating(double rating) {
         this.rating = rating;
     }
 

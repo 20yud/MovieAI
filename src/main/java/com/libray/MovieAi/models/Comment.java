@@ -3,13 +3,18 @@ package com.libray.MovieAi.models;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "Comments")
 public class Comment {
 
-    @Id
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private int id;
 
     @ManyToOne
@@ -23,12 +28,12 @@ public class Comment {
     @Column(name = "comment_text", length = 1000, nullable = false)
     private String commentText;
 
-    @Column(name = "comment_date", nullable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "comment_date", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime commentDate;
 
-    // Constructors
+    // Constructor with default value for commentDate
     public Comment() {
-        this.commentDate = LocalDateTime.now(); // Initialize commentDate with the current timestamp
+        this.commentDate = LocalDateTime.now(); // Assign the current timestamp here
     }
 
     // Getters and Setters
@@ -72,3 +77,4 @@ public class Comment {
         this.commentDate = commentDate;
     }
 }
+

@@ -23,15 +23,15 @@ public class Rating {
     @Column(name = "rating", nullable = false)
     private double rating;
 
-    @Column(name = "rating_date", nullable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "rating_date", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime ratingDate;
 
-    // Constructors
+    // Constructors, getters, and setters
     public Rating() {
-        this.ratingDate = LocalDateTime.now(); // Initialize ratingDate with the current timestamp
+        this.ratingDate = LocalDateTime.now();
     }
 
-    // Getters and Setters
+    // Getters and setters
     public int getId() {
         return id;
     }

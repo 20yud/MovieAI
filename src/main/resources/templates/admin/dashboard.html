@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" 
+th:fragment="Layout(content)">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -117,6 +118,7 @@
     <div class="main-content" id="main-content">
         <div id="home" class="section active">
             <h1>Dashboard</h1>
+            
             <div class="card">
                 <h3>Total Films</h3>
                 <p>1234</p>
@@ -125,6 +127,7 @@
                 <h3>Total Users</h3>
                 <p>5678</p>
             </div>
+            <div th:replace="${content}"></div>
         </div>
    <div id="profile" class="section">
     <h1>Users</h1>

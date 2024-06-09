@@ -94,9 +94,16 @@ public class HomeController {
         return "login";
     }
     
-    @GetMapping("/homee")
-    public String HomeForm() {
-        return "home";
+   
+    @GetMapping("/register")
+    public String registerForm(UserDto userDto) {
+        return "register";
+    }
+
+    @PostMapping("/register")
+    public String registerUser(UserDto userDto) {
+        userService.createUser(userDto);
+        return "redirect:/login"; // Redirect to the login page after successful registration
     }
     
     
@@ -119,17 +126,16 @@ public class HomeController {
     }
 
 
-    @GetMapping("/register")
-    public String registerForm(UserDto userDto) {
-        return "register";
-    }
-
-    @PostMapping("/register")
-    public String registerUser(UserDto userDto) {
-        userService.createUser(userDto);
-        return "redirect:/login"; // Redirect to the login page after successful registration
+   
+    @GetMapping("/sideabar")
+    public String showSidebarPage() {
+        return "sidebar"; // Assuming your HTML file is named "dashboard.html" and it's under "admin" directory
     }
     
+    @GetMapping("/error")
+    public String showErrorPage() {
+        return "error"; // Assuming your HTML file is named "dashboard.html" and it's under "admin" directory
+    }
    
 
    

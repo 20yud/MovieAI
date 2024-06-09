@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="sidebar::Layout(~{::section})">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Movie</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+</head>
+<body>
+<section>
+    <div class="container">
+        <h1>Add Movie</h1>
+        <form th:action="@{/admin/movies/add}" th:object="${movie}" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="imdbId" class="form-label">IMDB ID</label>
+                <input type="text" class="form-control" id="imdbId" th:field="*{imdbId}" required>
+            </div>
+            <div class="mb-3">
+                <label for="originalTitle" class="form-label">Original Title</label>
+                <input type="text" class="form-control" id="originalTitle" th:field="*{originalTitle}" required>
+            </div>
+            <div class="mb-3">
+                <label for="overview" class="form-label">Overview</label>
+                <textarea class="form-control" id="overview" th:field="*{overview}" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="popularity" class="form-label">Popularity</label>
+                <input type="number" step="0.01" class="form-control" id="popularity" th:field="*{popularity}" required>
+            </div>
+          <div class="mb-3">
+        <label for="posterFile" class="form-label">Poster Path</label>
+        <input type="file" class="form-control" id="posterFile" name="posterFile" required>
+        <small class="text-muted">C:\Workspace\UIT\CongNgheJava\doan\fee\MovieAi\src\main\resources\static\images\posters are allowed.</small>
+    </div>
+
+            <div class="mb-3">
+                <label for="releaseDate" class="form-label">Release Date</label>
+                <input type="date" class="form-control" id="releaseDate" th:field="*{releaseDate}" required>
+            </div>
+            <div class="mb-3">
+                <label for="runtime" class="form-label">Runtime</label>
+                <input type="text" class="form-control" id="runtime" th:field="*{runtime}" required>
+            </div>
+            <div class="mb-3">
+                <label for="voteAverage" class="form-label">Vote Average</label>
+                <input type="number" step="0.01" class="form-control" id="voteAverage" th:field="*{voteAverage}" required>
+            </div>
+            <div class="mb-3">
+                <label for="voteCount" class="form-label">Vote Count</label>
+                <input type="number" class="form-control" id="voteCount" th:field="*{voteCount}" required>
+            </div>
+ <div class="mb-3">
+                <label for="genres" class="form-label">Genres</label>
+                <select multiple class="form-select" id="genres" name="genreIds" required>
+                    <option th:each="genre : ${genres}"
+                            th:value="${genre.id}"
+                            th:text="${genre.name}"
+                            th:selected="${genreIds != null and genreIds.contains(genre.id)}"></option>
+                </select>
+                <div id="selectedGenres"></div>
+                <button type="button" class="btn btn-primary mt-2" id="addGenreBtn">Add Genre</button>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Movie</button>
+        </form>
+    </div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener('DOMContentLoaded', function () {
+        const addGenreBtn = document.getElementById('addGenreBtn');
+        const selectedGenres = document.getElementById('selectedGenres');
+
+        addGenreBtn.addEventListener('click', function () {
+            const selectedGenreSelect = document.getElementById('genres');
+            const selectedGenreOption = selectedGenreSelect.options[selectedGenreSelect.selectedIndex];
+
+            if (selectedGenreOption) {
+                const genreId = selectedGenreOption.value;
+                const genreName = selectedGenreOption.textContent;
+
+                const existingGenre = document.querySelector(`[data-genre-id="${genreId}"]`);
+                if (!existingGenre) {
+                    const genreDiv = document.createElement('div');
+                    genreDiv.setAttribute('data-genre-id', genreId);
+                    genreDiv.innerHTML = `
+                        <input type="hidden" name="genreIds" value="${genreId}">
+                        <span>${genreName}</span>
+                        <button type="button" class="btn btn-danger btn-sm ms-2" onclick="removeGenre(${genreId})">Remove</button>
+                    `;
+                    selectedGenres.appendChild(genreDiv);
+                }
+            }
+        });
+
+        window.removeGenre = function (genreId) {
+            const genreDiv = document.querySelector(`[data-genre-id="${genreId}"]`);
+            if (genreDiv) {
+                genreDiv.remove();
+            }
+        };
+    });
+    /*]]>*/
+</script>
+
+
+   
+</section>
+</body>
+</html>
