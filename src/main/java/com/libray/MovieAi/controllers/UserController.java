@@ -1,9 +1,6 @@
 package com.libray.MovieAi.controllers;
 
 
-
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -37,7 +34,9 @@ public class UserController {
     private MoviesRepository repo;
     @Autowired
     private GenresRepository genresRepository;
-
+    
+    
+    
     @GetMapping("/")
     public String home() {
         return "users/index";
@@ -96,4 +95,6 @@ public class UserController {
         // Redirect to the login page or any other desired page after logout
         return "redirect:/login";
     }
+  
+
 }

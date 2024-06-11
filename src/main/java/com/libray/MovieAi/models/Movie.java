@@ -154,4 +154,10 @@ public class Movie {
     public void setVoteCount(int voteCount) {
         this.voteCount = voteCount;
     }
+    
+    public void removeGenre(Genre genre) {
+        genres.remove(genre);
+        genre.getMovies().remove(this);
+    }
+
 }

@@ -10,7 +10,8 @@
 <section>
     <div class="container">
         <h1>Edit Movie</h1>
-        <form th:action="@{/admin/movies/edit}" th:object="${movie}" method="post" enctype="multipart/form-data">
+        <form th:action="@{'/admin/movies/edit/' + ${movie.id}}" th:object="${movie}" method="post" enctype="multipart/form-data">
+
             <div class="mb-3">
                 <label for="imdbId" class="form-label">IMDB ID</label>
                 <input type="text" class="form-control" id="imdbId" th:field="*{imdbId}" required>
@@ -35,8 +36,6 @@
             <div class="mb-3">
                 <label for="releaseDate" class="form-label">Release Date</label>
                 <input type="text" class="form-control" id="releaseDate" th:field="*{releaseDate}" required>
-
-
             </div>
             <div class="mb-3">
                 <label for="runtime" class="form-label">Runtime</label>
@@ -62,52 +61,61 @@
                     <div th:each="genre : ${movie.genres}" th:data-genre-id="${genre.id}">
                         <input type="hidden" name="genreIds" th:value="${genre.id}">
                         <span th:text="${genre.name}"></span>
-                        <button type="button" class="btn btn-danger btn-sm ms-2" th:attr="onclick='removeGenre(' + ${genre.id} + ')'">Remove</button>
+                       <button type="button" class="btn btn-danger btn-sm ms-2" th:attr="onclick='removeGenre(' + ${genre.id} + ')'">Remove</button>
+
                     </div>
                 </div>
                 <button type="button" class="btn btn-primary mt-2" id="addGenreBtn">Add Genre</button>
             </div>
+            
             <button type="submit" class="btn btn-primary">Update Movie</button>
         </form>
     </div>
 
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        document.addEventListener('DOMContentLoaded', function () {
-            const addGenreBtn = document.getElementById('addGenreBtn');
-            const selectedGenres = document.getElementById('selectedGenres');
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener('DOMContentLoaded', function () {
+        const addGenreBtn = document.getElementById('addGenreBtn');
+        const selectedGenres = document.getElementById('selectedGenres');
 
-            addGenreBtn.addEventListener('click', function () {
-                const selectedGenreSelect = document.getElementById('genres');
-                const selectedGenreOption = selectedGenreSelect.options[selectedGenreSelect.selectedIndex];
+        addGenreBtn.addEventListener('click', function () {
+            const selectedGenreSelect = document.getElementById('genres');
+            const selectedGenreOption = selectedGenreSelect.options[selectedGenreSelect.selectedIndex];
 
-                if (selectedGenreOption) {
-                    const genreId = selectedGenreOption.value;
-                    const genreName = selectedGenreOption.textContent;
+            if (selectedGenreOption) {
+                const genreId = selectedGenreOption.value;
+                const genreName = selectedGenreOption.textContent;
 
-                    const existingGenre = document.querySelector(`[data-genre-id="${genreId}"]`);
-                    if (!existingGenre) {
-                        const genreDiv = document.createElement('div');
-                        genreDiv.setAttribute('data-genre-id', genreId);
-                        genreDiv.innerHTML = `
-                            <input type="hidden" name="genreIds" value="${genreId}">
-                            <span>${genreName}</span>
-                            <button type="button" class="btn btn-danger btn-sm ms-2" onclick="removeGenre(${genreId})">Remove</button>
-                        `;
-                        selectedGenres.appendChild(genreDiv);
-                    }
+                const existingGenre = document.querySelector(`[data-genre-id="${genreId}"]`);
+                if (!existingGenre) {
+                    const genreDiv = document.createElement('div');
+                    genreDiv.setAttribute('data-genre-id', genreId);
+                    genreDiv.innerHTML = `
+                        <input type="hidden" name="genreIds" value="${genreId}">
+                        <span>${genreName}</span>
+                        <button type="button" class="btn btn-danger btn-sm ms-2" onclick="removeGenre(${genreId})">Remove</button>
+                    `;
+                    selectedGenres.appendChild(genreDiv);
                 }
-            });
-
-            window.removeGenre = function (genreId) {
-                const genreDiv = document.querySelector(`[data-genre-id="${genreId}"]`);
-                if (genreDiv) {
-                    genreDiv.remove();
-                }
-            };
+            }
         });
-        /*]]>*/
-    </script>
+
+        window.removeGenre = function (genreId) {
+            const genreDiv = document.querySelector(`[data-genre-id="${genreId}"]`);
+            if (genreDiv) {
+                genreDiv.remove();
+                // Remove the selected option from the select element
+                const selectedGenreSelect = document.getElementById('genres');
+                const selectedGenreOption = selectedGenreSelect.querySelector(`option[value="${genreId}"]`);
+                if (selectedGenreOption) {
+                    selectedGenreOption.selected = false;
+                }
+            }
+        };
+
+    });
+    /*]]>*/
+</script>
 
 </section>
 </body>

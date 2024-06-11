@@ -1,6 +1,8 @@
 package com.libray.MovieAi.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,7 @@ import jakarta.transaction.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -21,6 +24,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private JavaMailSender emailSender; // Autowire JavaMailSender
 
     @Override
     @Transactional
@@ -80,4 +86,41 @@ public class UserServiceImpl implements UserService {
     public List<User> findAllUsers() {
         return userRepository.findAll();
     }
+    @Override
+    public boolean checkEmailExists(String email) {
+        return userRepository.existsByEmail(email);
+    }
+    
+    @Override
+    public String generateNewPassword() {
+        Random random = new Random();
+        StringBuilder newPassword = new StringBuilder();
+        for (int i = 0; i < 6; i++) {
+            int digit = random.nextInt(10);
+            newPassword.append(digit);
+        }
+        String generatedPassword = newPassword.toString();
+        System.out.println("Generated new password: " + generatedPassword); // Print the new password to the console
+        return generatedPassword;
+    }
+
+    
+    @Override
+    public void updatePasswordByEmail(String email, String newPassword) {
+        User user = userRepository.findByEmail(email);
+        if (user != null) {
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+        }
+    }
+    
+    @Override
+    public void sendNewPasswordEmail(String toEmail, String newPassword) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject("New Password");
+        message.setText("Your new password is: " + newPassword);
+        emailSender.send(message);
+    }
+
 }

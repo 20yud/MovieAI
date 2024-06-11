@@ -16,4 +16,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
 	    @Query("SELECT u FROM User u LEFT JOIN FETCH u.favorites f LEFT JOIN FETCH f.movie WHERE u.username = :username")
 	    User findByUsernameWithFavorites(@Param("username") String username);
+	    boolean existsByEmail(String email); // Add this method
+	    
+	    User findByEmail(String email); // Add this method
 }

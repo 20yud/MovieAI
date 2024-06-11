@@ -24,6 +24,8 @@ import com.libray.MovieAi.services.MovieService;
 import com.libray.MovieAi.services.MoviesRepository;
 import com.libray.MovieAi.services.UserService;
 
+import jakarta.transaction.Transactional;
+
 @RestController
 @RequestMapping("/favorites")
 public class FavoritesController {
@@ -71,14 +73,16 @@ public class FavoritesController {
         Optional<Movie> movie = movieRepository.findById(movieId);
 
         if (user != null && movie.isPresent()) {
-            if (!favoritesService.isFavorite(user, movie.get())) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("You have not liked this movie yet.");
+            if (favoritesService.isFavorite(user, movie.get())) {
+                favoritesService.removeFavorite(user, movie.get());
+                return ResponseEntity.ok("Movie unliked successfully.");
+            } else {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("You haven't liked this movie yet.");
             }
-            favoritesService.removeFavorite(user, movie.get());
-            return ResponseEntity.ok("Movie unliked successfully.");
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or Movie not found.");
         }
     }
+
 
 }

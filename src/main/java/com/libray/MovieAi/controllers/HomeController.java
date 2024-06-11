@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -93,6 +94,36 @@ public class HomeController {
     public String loginForm() {
         return "login";
     }
+    
+    @GetMapping("/forgetpwd")
+    public String forgetpasswordPage() {
+        return "forgetpassword";
+    }
+    
+    @PostMapping("/check-email")
+    public ResponseEntity<?> checkEmailExists(@RequestParam String email) {
+        // Print notice that the method is called
+        System.out.println("Checking email existence for: " + email);
+        
+        boolean emailExists = userService.checkEmailExists(email);
+        if (emailExists) {
+            // Email exists, generate a new password
+            String newPassword = userService.generateNewPassword();
+
+            // Send the new password to the email account
+            userService.sendNewPasswordEmail(email, newPassword);
+
+            // Update the new password in the database
+            userService.updatePasswordByEmail(email, newPassword);
+
+            // Return success response
+            return ResponseEntity.ok().build();
+        } else {
+            // Email doesn't exist, return error response
+            return ResponseEntity.badRequest().body("Email does not exist");
+        }
+    }
+
     
    
     @GetMapping("/register")

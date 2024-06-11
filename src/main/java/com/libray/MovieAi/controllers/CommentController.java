@@ -22,8 +22,11 @@ import com.libray.MovieAi.services.CommentService;
 import com.libray.MovieAi.services.RatingService;
 import com.libray.MovieAi.services.UserService;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -57,13 +60,24 @@ public class CommentController {
     @GetMapping("/fetchComments/{movieId}")
     public ResponseEntity<List<CommentDto>> fetchComments(@PathVariable int movieId) {
         List<Comment> comments = commentService.getCommentsByMovieId(movieId);
+        List<Rating> ratings = ratingService.getRatingsByMovieId(movieId);
         List<CommentDto> commentDtos = new ArrayList<>();
+
+        // Create a map to store ratings by date
+        Map<LocalDate, Double> ratingMap = new HashMap<>();
+        for (Rating rating : ratings) {
+            ratingMap.put(rating.getRatingDate().toLocalDate(), rating.getRating());
+        }
 
         for (Comment comment : comments) {
             CommentDto commentDto = new CommentDto();
             commentDto.setId(comment.getId());
             commentDto.setCommentText(comment.getCommentText());
             commentDto.setCommentDate(comment.getCommentDate());
+
+            // Check if there is a rating for the comment's date
+            Double ratingValue = ratingMap.get(comment.getCommentDate().toLocalDate());
+            commentDto.setRating(ratingValue != null ? ratingValue : -1); // Set rating to -1 if not found
 
             // Populate user information
             UserDto userDto = new UserDto();
@@ -76,6 +90,7 @@ public class CommentController {
 
         return ResponseEntity.ok(commentDtos);
     }
+
 
  // Inside your controller method where you handle rating submission
     @PostMapping("/ratings")

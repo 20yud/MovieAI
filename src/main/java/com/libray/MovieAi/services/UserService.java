@@ -15,5 +15,9 @@ public interface UserService {
 	    boolean authenticateUser(String username, String password);
 	    User getUserByUsername(String username);
 	    User getUserByUsernameWithFavorites(String username);  // Add this method
+	    boolean checkEmailExists(String email);
+	    String generateNewPassword();
+	    void updatePasswordByEmail(String email, String newPassword);
+	    void sendNewPasswordEmail(String toEmail, String newPassword);
 	    
 }

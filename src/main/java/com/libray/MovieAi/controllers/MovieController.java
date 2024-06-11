@@ -127,6 +127,27 @@ public class MovieController {
             e.printStackTrace();
             model.addAttribute("genreRecommendedMovies", List.of()); // Add an empty list if there is an error
         }
+        
+        
+        //model
+        
+        String genApiUrl = "http://localhost:5556/api/movie-recommendations?id=" + id;
+        try {
+            Map<String, Object> genreResponse = restTemplate.getForObject(genApiUrl, Map.class);
+            if (genreResponse != null && genreResponse.containsKey("top_genres")) {
+                List<Map<String, Object>> grecommendermodel = (List<Map<String, Object>>) genreResponse.get("top_genres");
+                System.out.println("Genre-based Recommended Movies: " + grecommendermodel);
+                model.addAttribute("grecommendermodel", grecommendermodel);
+            } else {
+                System.out.println("No genre-based recommended movies found in the response.");
+                model.addAttribute("grecommendermodel", List.of()); // Add an empty list if no recommendations
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("grecommendermodel", List.of()); // Add an empty list if there is an error
+        }
+
+
         model.addAttribute("movie", movie);
         model.addAttribute("genres", genres);
         return "movies/detailMovie";

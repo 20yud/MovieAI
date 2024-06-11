@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -17,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -205,38 +207,48 @@ public class DashboardController {
 
 
 	 @GetMapping("/movies/edit/{id}")
-	 public String showEditMovieForm(@PathVariable Integer id, Model model) {
-	     Optional<Movie> movieOptional = repo.findById(id);
-	     if (movieOptional.isPresent()) {
-	         Movie movie = movieOptional.get();
-	         model.addAttribute("movie", movie);
-	         model.addAttribute("genres", genresRepository.findAll());
-	         return "admin/movies/edit";
-	     } else {
-	         return "redirect:/admin/showmovies";
-	     }
-	 }
+	    public String showEditMovieForm(@PathVariable Integer id, Model model) {
+	        Optional<Movie> movieOptional = repo.findById(id);
+	        if (movieOptional.isPresent()) {
+	            Movie movie = movieOptional.get();
+	            model.addAttribute("movie", movie);
+	            model.addAttribute("genres", genresRepository.findAll());
+	            return "admin/movies/edit";
+	        } else {
+	            return "redirect:/admin/showmovies";
+	        }
+	    }
 
-
-	 @PostMapping("/movies/edit")
-	 public String editMovie(@ModelAttribute @Valid Movie movie, 
-	                         @RequestParam("genreIds") List<Integer> genreIds, 
+	 @PostMapping("/movies/edit/{id}")
+	 public String editMovie(@ModelAttribute @Valid Movie movie,
+	                         BindingResult bindingResult,
+	                         @RequestParam("genreIds") List<Integer> genreIds,
 	                         @RequestParam("posterFile") MultipartFile posterFile,
 	                         RedirectAttributes redirectAttributes) {
+	     if (bindingResult.hasErrors()) {
+	         redirectAttributes.addFlashAttribute("errorMessage", "Validation errors occurred.");
+	         return "redirect:/admin/movies/edit/" + movie.getId();
+	     }
+
 	     try {
 	         Optional<Movie> movieOptional = repo.findById(movie.getId());
 	         if (movieOptional.isPresent()) {
 	             Movie existingMovie = movieOptional.get();
 
-	             // Update fields only if they have new values
-	             if (Objects.nonNull(movie.getImdbId())) existingMovie.setImdbId(movie.getImdbId());
-	             if (Objects.nonNull(movie.getOriginalTitle())) existingMovie.setOriginalTitle(movie.getOriginalTitle());
-	             if (Objects.nonNull(movie.getOverview())) existingMovie.setOverview(movie.getOverview());
-	             if (Objects.nonNull(movie.getPopularity())) existingMovie.setPopularity(movie.getPopularity());
-	             if (Objects.nonNull(movie.getReleaseDate())) existingMovie.setReleaseDate(movie.getReleaseDate());
-	             if (Objects.nonNull(movie.getRuntime())) existingMovie.setRuntime(movie.getRuntime());
-	             if (Objects.nonNull(movie.getVoteAverage())) existingMovie.setVoteAverage(movie.getVoteAverage());
-	             if (Objects.nonNull(movie.getVoteCount())) existingMovie.setVoteCount(movie.getVoteCount());
+	             // Log incoming data
+	             System.out.println("Incoming Movie Data: " + movie);
+
+	             // Update fields without checking for null
+	             existingMovie.setImdbId(movie.getImdbId());
+	             existingMovie.setOriginalTitle(movie.getOriginalTitle());
+	             existingMovie.setOverview(movie.getOverview());
+	             existingMovie.setPopularity(movie.getPopularity());
+	             existingMovie.setRuntime(movie.getRuntime());
+	             existingMovie.setVoteAverage(movie.getVoteAverage());
+	             existingMovie.setVoteCount(movie.getVoteCount());
+
+	             String releaseDateStr = movie.getReleaseDate();
+	             existingMovie.setReleaseDate(releaseDateStr);
 
 	             // Handle the poster file if it was uploaded
 	             if (!posterFile.isEmpty()) {
@@ -249,12 +261,20 @@ public class DashboardController {
 	                 existingMovie.setPosterPath(pathname);
 	             }
 
-	             // Set the genres for the movie
-	             List<Genre> genres = genresRepository.findAllById(genreIds);
-	             existingMovie.setGenres(genres);
+	             if (!genreIds.isEmpty()) {
+	                 // Set the genres for the movie
+	                 List<Genre> newGenres = genresRepository.findAllById(genreIds);
+	                 existingMovie.setGenres(newGenres);
+	             } else {
+	                 // Remove all existing genres if no new genres are provided
+	                 existingMovie.getGenres().clear();
+	             }
 
-	             // Save the updated movie
+	             // Save the movie to update genres
 	             repo.save(existingMovie);
+
+	             // Log movie details after update
+	             System.out.println("Updated movie: " + existingMovie);
 
 	             redirectAttributes.addFlashAttribute("successMessage", "Movie updated successfully!");
 	         } else {
@@ -266,6 +286,7 @@ public class DashboardController {
 	     }
 	     return "redirect:/admin/showmovies";
 	 }
+
 
 
 
