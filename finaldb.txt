@@ -1,0 +1,135 @@
+-- Creating the Movies table
+CREATE TABLE Movies (
+    id INT AUTO_INCREMENT,
+    imdb_id VARCHAR(9),
+    original_title VARCHAR(86),
+    overview VARCHAR(1000),
+    popularity DOUBLE,
+    poster_path VARCHAR(32),
+    release_date VARCHAR(10),
+    runtime VARCHAR(3),
+    vote_average DOUBLE,
+    vote_count INT,
+    PRIMARY KEY (id)
+);
+
+-- Creating the Genres table
+CREATE TABLE Genres (
+    id INT AUTO_INCREMENT,
+    name VARCHAR(255),
+    PRIMARY KEY (id)
+);
+
+-- Creating the join table movie_genre
+CREATE TABLE movie_genre (
+    movie_id INT,
+    genre_id INT,
+    PRIMARY KEY (movie_id, genre_id),
+    FOREIGN KEY (movie_id) REFERENCES Movies(id),
+    FOREIGN KEY (genre_id) REFERENCES Genres(id)
+);
+
+
+CREATE TABLE Users (
+    id INT AUTO_INCREMENT,
+    username VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    join_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    role VARCHAR(20) NOT NULL DEFAULT 'USER',
+    PRIMARY KEY (id),
+    UNIQUE (username),
+    UNIQUE (email)
+);
+
+
+
+CREATE TABLE Comments (
+    id INT AUTO_INCREMENT,
+    user_id INT,
+    movie_id INT,
+    comment_text VARCHAR(1000) NOT NULL,
+    comment_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES Users(id),
+    FOREIGN KEY (movie_id) REFERENCES Movies(id)
+);
+
+
+CREATE TABLE Ratings (
+    id INT AUTO_INCREMENT,
+    user_id INT,
+    movie_id INT,
+    rating DOUBLE NOT NULL,
+    rating_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES Users(id),
+    FOREIGN KEY (movie_id) REFERENCES Movies(id)
+);
+
+
+CREATE TABLE Favorites (
+    id INT AUTO_INCREMENT,
+    user_id INT,
+    movie_id INT,
+    favorite_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES Users(id),
+    FOREIGN KEY (movie_id) REFERENCES Movies(id)
+);
+CREATE TABLE JustWatched (
+    id INT AUTO_INCREMENT,
+    user_id INT,
+    movie_id INT,
+    watch_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES Users(id),
+    FOREIGN KEY (movie_id) REFERENCES Movies(id)
+);
+
+DELIMITER //
+CREATE TRIGGER update_movie_ratings AFTER INSERT ON Ratings
+FOR EACH ROW
+BEGIN
+    -- Cập nhật vote_count bằng cách thêm 1
+    UPDATE Movies SET vote_count = vote_count + 1 WHERE id = NEW.movie_id;
+
+    -- Kiểm tra nếu vote_average ban đầu là 0
+    IF (SELECT vote_average FROM Movies WHERE id = NEW.movie_id) = 0 THEN
+        -- Đặt vote_average mới là điểm rating mới
+        UPDATE Movies SET vote_average = NEW.rating WHERE id = NEW.movie_id;
+    ELSE
+        -- Tính lại vote_average
+        UPDATE Movies SET vote_average = ROUND((vote_average * (vote_count - 1) + NEW.rating) / vote_count, 1) WHERE id = NEW.movie_id;
+    END IF;
+END;
+//
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE TRIGGER before_insert_JustWatched
+BEFORE INSERT ON JustWatched
+FOR EACH ROW
+BEGIN
+    DECLARE existing_id INT;
+    
+    -- Check if the combination of user_id and movie_id already exists
+    SELECT id INTO existing_id
+    FROM JustWatched
+    WHERE user_id = NEW.user_id AND movie_id = NEW.movie_id
+    LIMIT 1;
+    
+    -- If the combination already exists, delete the existing record
+    IF existing_id IS NOT NULL THEN
+        DELETE FROM JustWatched
+        WHERE id = existing_id;
+    END IF;
+    
+    -- Otherwise, do nothing (let the new record be inserted)
+END//
+
+DELIMITER ;
+
+

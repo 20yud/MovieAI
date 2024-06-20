@@ -31,6 +31,14 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User createUser(UserDto userDto) {
+        // Check if username or email already exists
+        if (userRepository.existsByUsername(userDto.getUsername())) {
+            throw new RuntimeException("Tên đăng nhập đã tồn tại: " + userDto.getUsername());
+        }
+        if (userRepository.existsByEmail(userDto.getEmail())) {
+            throw new RuntimeException("Email đã được sử dụng: " + userDto.getEmail());
+        }
+
         User user = new User();
         user.setUsername(userDto.getUsername());
         user.setEmail(userDto.getEmail());
@@ -40,6 +48,8 @@ public class UserServiceImpl implements UserService {
 
         return userRepository.save(user);
     }
+    
+    
 
     @Override
     public boolean authenticateUser(String username, String password) {
@@ -66,6 +76,14 @@ public class UserServiceImpl implements UserService {
     public User updateUser(int id, UserDto userDto) {
         User user = userRepository.findById(id).orElse(null);
         if (user != null) {
+            // Check if updated username or email already exists (excluding current user)
+            if (!user.getUsername().equals(userDto.getUsername()) && userRepository.existsByUsername(userDto.getUsername())) {
+                throw new RuntimeException("Username already exists: " + userDto.getUsername());
+            }
+            if (!user.getEmail().equals(userDto.getEmail()) && userRepository.existsByEmail(userDto.getEmail())) {
+                throw new RuntimeException("Email already exists: " + userDto.getEmail());
+            }
+            
             user.setUsername(userDto.getUsername());
             user.setEmail(userDto.getEmail());
             if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
@@ -86,6 +104,12 @@ public class UserServiceImpl implements UserService {
     public List<User> findAllUsers() {
         return userRepository.findAll();
     }
+    
+    @Override
+    public boolean checkUsernameExists(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
     @Override
     public boolean checkEmailExists(String email) {
         return userRepository.existsByEmail(email);
@@ -104,7 +128,6 @@ public class UserServiceImpl implements UserService {
         return generatedPassword;
     }
 
-    
     @Override
     public void updatePasswordByEmail(String email, String newPassword) {
         User user = userRepository.findByEmail(email);
@@ -122,5 +145,4 @@ public class UserServiceImpl implements UserService {
         message.setText("Your new password is: " + newPassword);
         emailSender.send(message);
     }
-
 }

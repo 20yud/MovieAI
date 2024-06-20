@@ -26,12 +26,12 @@
 <body>
     <section th:if="${user != null}">
         <div class="container py-5">
-            <h1 class="text-center mb-4" style="color: #FFD700;">Hồ Sơ</h1>
+            <h1 class="text-center mb-4" style="color: #FFD700;">Profile</h1>
             <div class="row">
                 <div class="col-md-4">
                     <div class="card shadow-sm mb-4">
                         <div class="card-body">
-                            <h5 class="card-title">Tên Đăng Nhập</h5>
+                            <h5 class="card-title">Username</h5>
                             <p class="card-text" th:text="${user.username}"></p>
                         </div>
                     </div>
@@ -47,13 +47,13 @@
                 <div class="col-md-4">
                     <div class="card shadow-sm mb-4">
                         <div class="card-body">
-                            <h5 class="card-title">Ngày Gia Nhập</h5>
+                            <h5 class="card-title">Join Date</h5>
                             <p class="card-text" th:text="${user.joinDate}"></p>
                         </div>
                     </div>
                 </div>
             </div>
-            <h2 class="text-center mb-4" style="color: #FFD700;">Danh Sách Yêu Thích</h2>
+            <h2 class="text-center mb-4" style="color: #FFD700;">Favorite Films</h2>
             <div class="row">
                 <div th:each="favorite : ${user.favorites}" class="col-6 col-md-4 col-lg-2">
                     <a th:href="@{'/movies/detail/' + ${favorite.movie.id}}" class="text-decoration-none text-dark">
@@ -66,6 +66,21 @@
                     </a>
                 </div>
             </div>
+<h2 class="text-center mb-4" style="color: #FFD700;">List Just Watched</h2>
+<div class="row">
+    <div th:each="watched, iterStat : ${justWatchedMovies}" class="col-6 col-md-4 col-lg-2" th:if="${iterStat.index < 6}">
+        <a th:href="@{'/movies/detail/' + ${watched.movie.id}}" class="text-decoration-none text-dark">
+            <div class="card movie-card shadow-sm mb-4">
+                <img th:src="@{'/images/posters' + ${watched.movie.posterPath} + '.jpg'}" class="card-img-top" alt="Movie Poster">
+                <div class="card-body">
+                    <h6 class="card-title text-center mb-0" th:text="${watched.movie.originalTitle}"></h6>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+
         </div>
     </section>
 </body>

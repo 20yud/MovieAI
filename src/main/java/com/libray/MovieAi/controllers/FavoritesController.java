@@ -48,6 +48,8 @@ public class FavoritesController {
     public FavoritesController(FavoritesService favoritesService) {
         this.favoritesService = favoritesService;
     }
+    
+    
 
     @PostMapping("/like/{movieId}")
     public ResponseEntity<String> likeMovie(@PathVariable Integer movieId, Principal principal) {

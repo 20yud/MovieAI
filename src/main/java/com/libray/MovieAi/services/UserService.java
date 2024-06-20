@@ -14,8 +14,9 @@ public interface UserService {
 	    List<User> findAllUsers();
 	    boolean authenticateUser(String username, String password);
 	    User getUserByUsername(String username);
-	    User getUserByUsernameWithFavorites(String username);  // Add this method
+	    User getUserByUsernameWithFavorites(String username);
 	    boolean checkEmailExists(String email);
+	    boolean checkUsernameExists(String username); // Add this method
 	    String generateNewPassword();
 	    void updatePasswordByEmail(String email, String newPassword);
 	    void sendNewPasswordEmail(String toEmail, String newPassword);

@@ -40,18 +40,18 @@ th:replace="base::Layout(~{::section})">
  
    <main class="container my-4">
     <!-- Search form -->
-    <h1>Tìm Kiếm Phim</h1>
+    <h1>Searching Film</h1>
     <!-- Search form -->
 <form method="get" action="/movies/search" class="mb-4">
     <div class="input-group">
         <input type="text" class="form-control" name="query" placeholder="Tìm kiếm tên phim..." th:value="${query}">
-        <button class="btn btn-primary" type="submit">Tìm</button>
+        <button class="btn btn-primary" type="submit">Search</button>
     </div>
 </form>
 
 
     <!-- Display search results -->
-    <h1 class="text-center my-4" style="color: #FFD700;">Kết Quả Tìm Kiếm</h1>  
+    <h1 class="text-center my-4" style="color: #FFD700;">Result</h1>  
     <div class="row row-cols-1 row-cols-md-6 g-4">
         <!-- Movie cards for search results will be dynamically inserted here -->
         <!-- Assuming the model attribute name is "searchResults" -->

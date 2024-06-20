@@ -5,6 +5,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,6 +26,8 @@ import com.libray.MovieAi.models.UserDto;
 import com.libray.MovieAi.repositories.GenresRepository;
 import com.libray.MovieAi.services.MoviesRepository;
 import com.libray.MovieAi.services.UserService;
+
+import jakarta.validation.Valid;
 
 
 
@@ -125,18 +129,6 @@ public class HomeController {
     }
 
     
-   
-    @GetMapping("/register")
-    public String registerForm(UserDto userDto) {
-        return "register";
-    }
-
-    @PostMapping("/register")
-    public String registerUser(UserDto userDto) {
-        userService.createUser(userDto);
-        return "redirect:/login"; // Redirect to the login page after successful registration
-    }
-    
     
     
     @PostMapping("/login")
@@ -156,7 +148,41 @@ public class HomeController {
         }
     }
 
+    @GetMapping("/register")
+    public String showRegistrationForm(Model model) {
+        model.addAttribute("userDto", new UserDto());
+        return "register";
+    }
 
+    @PostMapping("/register")
+    public String registerUser(@ModelAttribute("userDto") @Valid UserDto userDto,
+                               BindingResult bindingResult,
+                               RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            return "register";
+        }
+
+        try {
+            // Check if username or email already exists
+            if (userService.checkUsernameExists(userDto.getUsername())) {
+                redirectAttributes.addFlashAttribute("error", "Tên đăng nhập đã tồn tại: " + userDto.getUsername());
+                return "redirect:/register";
+            }
+
+            if (userService.checkEmailExists(userDto.getEmail())) {
+                redirectAttributes.addFlashAttribute("error", "Email đã được sử dụng");
+                return "redirect:/register";
+            }
+
+            // If everything is fine, proceed to create user
+            userService.createUser(userDto);
+            redirectAttributes.addFlashAttribute("successMessage", "User registered successfully!");
+            return "redirect:/login"; // Redirect to login page after successful registration
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/register";
+        }
+    }
    
     @GetMapping("/sideabar")
     public String showSidebarPage() {

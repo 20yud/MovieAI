@@ -71,9 +71,9 @@ th:replace="base::Layout(~{::section})">
             <!-- Movie Description -->
             <p th:text="${movie.overview}" class="lead"></p>
             <!-- Details -->
-            <p><strong>Ngày ra mắt:</strong> <span th:text="${movie.releaseDate}"></span></p>
-            <p><strong>Thời Lượng:</strong> <span th:text="${T(com.libray.MovieAi.utils.TimeUtil).formatRuntime(movie.runtime)}"></span></p>
-            <p><strong>Điểm đánh giá:</strong> <span th:text="${movie.voteAverage}"></span></p>
+            <p><strong>Date release:</strong> <span th:text="${movie.releaseDate}"></span></p>
+            <p><strong>Time:</strong> <span th:text="${T(com.libray.MovieAi.utils.TimeUtil).formatRuntime(movie.runtime)}"></span></p>
+            <p><strong>Rate:</strong> <span th:text="${movie.voteAverage}"></span></p>
             <p><strong>Type:</strong>
                 <span th:each="genre, iterStat : ${genres}">
                     <span th:text="${genre.name}"></span>
@@ -83,8 +83,8 @@ th:replace="base::Layout(~{::section})">
 
             <!-- Back Button -->
             <div class="d-grid mt-3" style="margin-top:50px;">
-                <a th:href="@{'/movies/watch/' + ${movie.id}}" class="btn btn-lg btn-danger">Xem Phim</a>
-            </div>
+    <a th:href="@{'/movies/justwatched/' + ${movie.id}}" class="btn btn-lg btn-danger">Watch</a>
+</div>
 <!-- Add to Favorites Button -->
 <div class="d-grid mt-3">
     <button id="likeButton" class="btn btn-lg btn-success">Like</button>
@@ -140,15 +140,10 @@ th:replace="base::Layout(~{::section})">
 </div>
 
 
- 
 
-
-        </div>
-    </div>
-</div>
 <!-- Maybe You Like Section -->
 <div class="container mt-4">
-    <h3 style="color: #FFD700;">Phim Đề Cử</h3>
+    <h3 style="color: #FFD700;">Maybe You Like</h3>
     <div class="row" id="maybeYouLikeMovies">
         <!-- Loop through recommended movies and display them -->
         <div th:each="movie : ${recommendedMovies}" class="col-md-2">
@@ -166,7 +161,7 @@ th:replace="base::Layout(~{::section})">
 
 <!-- Maybe You Like Section 2 -->
 <div class="container mt-4">
-    <h3 style="color: #FFD700;">Các Phim Có Cùng Thể Loại</h3>
+    <h3 style="color: #FFD700;">List Film With Same Genres</h3>
     <div class="row" id="maybeYouLikeMoviesByGenre">
         <!-- Loop through genre-based recommended movies and display them -->
         <div th:each="genreMovie : ${genreRecommendedMovies}" class="col-md-2">
@@ -181,16 +176,17 @@ th:replace="base::Layout(~{::section})">
         </div>
     </div>
 </div>
+<!-- Maybe You Like Section 3 -->
 <div class="container mt-4">
-    <h3 style="color: #FFD700;">Các Phim Có Cùng Thể Loại Của Poster</h3>
+    <h3 style="color: #FFD700;">List Film Similar To Poster</h3>
     <div class="row" id="maybeYouLikeMoviesByGenre">
         <!-- Loop through genre-based recommended movies and display them -->
         <div th:each="movie : ${grecommendermodel}" class="col-md-2">
             <a th:href="@{'/movies/detail/' + ${movie.id}}" class="text-decoration-none text-light">
                 <div class="card">
-                    <img th:src="@{'/images/posters' + ${movie.poster_path}+ '.jpg'}" class="card-img-top" alt="Movie Poster">
+                    <img th:src="@{'/images/posters' + ${movie.posterPath} + '.jpg'}" class="card-img-top" alt="Movie Poster">
                     <div class="card-body">
-                        <h5 class="card-title" th:text="${movie.original_title}"></h5>
+                        <h5 class="card-title" th:text="${movie.originalTitle}"></h5>
                     </div>
                 </div>
             </a>

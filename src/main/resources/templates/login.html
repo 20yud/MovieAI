@@ -8,31 +8,31 @@
 <body>
     <section>
         <form class="container mt-5" th:action="@{/login}" method="post" autocomplete="off" id="login-form">
-            <h1 class="mb-4 text-center">Đăng Nhập</h1>
+            <h1 class="mb-4 text-center">Login</h1>
             <div th:if="${param.error}" class="alert alert-danger">
-                Sai Mật Khẩu hoặc Tên Đăng Nhập
+                Incorrect Username or Password
             </div>
             <div th:if="${param.logout}" class="alert alert-success">
-                Bạn đã đăng xuất thành công.
+                You have successfully logged out.
             </div>
             <div class="mb-3">
-                <label for="username" class="form-label">Tên đăng nhập</label>
+                <label for="username" class="form-label">Username</label>
                 <input type="text" class="form-control" id="username" name="username" required style="font-size: 14px; padding: 8px;" size="1">
             </div>
             <div class="mb-3">
-                <label for="password" class="form-label">Mật khẩu</label>
+                <label for="password" class="form-label">Password</label>
                 <input type="password" class="form-control" id="password" name="password" required style="font-size: 14px; padding: 8px;" size="15">
             </div>
             <div class="gap-2 mb-3">
-                <button type="submit" class="btn btn-primary" style="font-size: 14px; padding: 8px 16px;">Đăng nhập</button>
-                <a href="/register" class="btn btn-success" style="font-size: 14px; padding: 8px 16px;">Đăng Kí</a>
+                <button type="submit" class="btn btn-primary" style="font-size: 14px; padding: 8px 16px;">Login</button>
+                <a href="/register" class="btn btn-success" style="font-size: 14px; padding: 8px 16px;">Register</a>
             </div>
             <div class="social-login">
-                <a href="#" class="btn btn-primary" style="font-size: 14px; padding: 8px 16px;"><img src="/images/icons8-facebook-logo-16.png" alt="Facebook Logo"> Đăng nhập bằng Facebook</a>
-                <a href="#" class="btn btn-danger" style="font-size: 14px; padding: 8px 16px;"><img src="/images/icons8-google-logo-16.png" alt="Google Logo"> Đăng nhập bằng Google</a>
+                <a href="#" class="btn btn-primary" style="font-size: 14px; padding: 8px 16px;"><img src="/images/icons8-facebook-logo-16.png" alt="Facebook Logo"> Log in with Facebook</a>
+                <a href="#" class="btn btn-danger" style="font-size: 14px; padding: 8px 16px;"><img src="/images/icons8-google-logo-16.png" alt="Google Logo"> Log in with Google</a>
             </div>
             <div class="mb-3">
-                <a href="/forgetpwd" class="link-secondary" onclick="showForgetPasswordForm()">Quên mật khẩu?</a>
+                <a href="/forgetpwd" class="link-secondary" onclick="showForgetPasswordForm()">Forgot password?</a>
             </div>
         </form>
     </section>

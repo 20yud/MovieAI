@@ -7,17 +7,22 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.libray.MovieAi.models.JustWatched;
 import com.libray.MovieAi.models.User;
 import com.libray.MovieAi.models.UserDto;
 import com.libray.MovieAi.repositories.GenresRepository;
+import com.libray.MovieAi.services.JustWatchedService;
 import com.libray.MovieAi.services.MoviesRepository;
 import com.libray.MovieAi.services.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,13 +35,10 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
     @Autowired
-    private MoviesRepository repo;
-    @Autowired
-    private GenresRepository genresRepository;
-    
-    
-    
+    private JustWatchedService justWatchedService;
+
     @GetMapping("/")
     public String home() {
         return "users/index";
@@ -52,14 +54,13 @@ public class UserController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
         User user = userService.getUserByUsernameWithFavorites(username);
-        model.addAttribute("user", user);
-        return "profile";
-    }
 
-    @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@Validated @RequestBody UserDto userDto) {
-        User createdUser = userService.createUser(userDto);
-        return ResponseEntity.ok(createdUser);
+        // Fetch all watched movies for the user
+        List<JustWatched> justWatchedMovies = justWatchedService.getRecentWatchedMovies(user.getId());
+
+        model.addAttribute("user", user);
+        model.addAttribute("justWatchedMovies", justWatchedMovies);
+        return "profile";
     }
 
     @GetMapping("/{id}")
@@ -85,7 +86,7 @@ public class UserController {
         List<User> users = userService.findAllUsers();
         return ResponseEntity.ok(users);
     }
-    
+
     @GetMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
         // Perform logout
@@ -95,6 +96,4 @@ public class UserController {
         // Redirect to the login page or any other desired page after logout
         return "redirect:/login";
     }
-  
-
 }

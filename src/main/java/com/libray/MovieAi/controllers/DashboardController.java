@@ -150,59 +150,51 @@ public class DashboardController {
 	        return "admin/movies";
 	    }
 
-	 @GetMapping("/movies/add")
-	    public String showAddMovieForm(Model model) {
-	        model.addAttribute("movie", new Movie());
-	        model.addAttribute("genres", genresRepository.findAll());
-	        return "admin/movies/create";
+	    @PostMapping("/movies/add")
+	    public String addMovie(@ModelAttribute @Valid Movie movie, 
+	                           @RequestParam("genreIds") List<Integer> genreIds, 
+	                           @RequestParam("posterFile") MultipartFile posterFile,
+	                           RedirectAttributes redirectAttributes) {
+	        try {
+	       	 
+	       	 // Parse the release date to the desired format
+	            DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	            DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("M/d/yyyy");
+	            LocalDate parsedDate = LocalDate.parse(movie.getReleaseDate(), inputFormatter);
+	            String formattedDate = outputFormatter.format(parsedDate);
+	            movie.setReleaseDate(formattedDate);
+	            // First, save the movie to generate the ID
+	            repo.save(movie);
+
+	            // Save the poster file
+	            String folder = "src/main/resources/static/images/posters/";
+	            String pathname = "/" + movie.getImdbId() + movie.getId() + ".jpg";
+	            String filename = movie.getImdbId() + movie.getId() + ".jpg" + ".jpg"; // Constructing the filename
+	            byte[] bytes = posterFile.getBytes();
+	            Path path = Paths.get(folder + filename);
+	            Files.write(path, bytes);
+
+	            // Set the poster path
+	            movie.setPosterPath(pathname);
+
+	            // Update the movie with the poster path
+	            repo.save(movie);
+
+	            // Set the genres for the movie
+	            List<Genre> genres = genresRepository.findAllById(genreIds);
+	            movie.setGenres(genres);
+
+	            // Save the movie again to update genres
+	            repo.save(movie);
+
+	            redirectAttributes.addFlashAttribute("successMessage", "Movie added successfully!");
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            redirectAttributes.addFlashAttribute("errorMessage", "An error occurred while adding the movie.");
+	        }
+	        
+	        return "redirect:/admin/showmovies";
 	    }
-
-	 @PostMapping("/movies/add")
-	 public String addMovie(@ModelAttribute @Valid Movie movie, 
-	                        @RequestParam("genreIds") List<Integer> genreIds, 
-	                        @RequestParam("posterFile") MultipartFile posterFile,
-	                        RedirectAttributes redirectAttributes) {
-	     try {
-	    	 
-	    	 // Parse the release date to the desired format
-	         DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-	         DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("M/d/yyyy");
-	         LocalDate parsedDate = LocalDate.parse(movie.getReleaseDate(), inputFormatter);
-	         String formattedDate = outputFormatter.format(parsedDate);
-	         movie.setReleaseDate(formattedDate);
-	         // First, save the movie to generate the ID
-	         repo.save(movie);
-
-	         // Save the poster file
-	         String folder = "src/main/resources/static/images/posters/";
-	         String pathname = "/" + movie.getImdbId() + movie.getId() + ".jpg";
-	         String filename = movie.getImdbId() + movie.getId() + ".jpg" + ".jpg"; // Constructing the filename
-	         byte[] bytes = posterFile.getBytes();
-	         Path path = Paths.get(folder + filename);
-	         Files.write(path, bytes);
-
-	         // Set the poster path
-	         movie.setPosterPath(pathname);
-
-	         // Update the movie with the poster path
-	         repo.save(movie);
-
-	         // Set the genres for the movie
-	         List<Genre> genres = genresRepository.findAllById(genreIds);
-	         movie.setGenres(genres);
-
-	         // Save the movie again to update genres
-	         repo.save(movie);
-
-	         redirectAttributes.addFlashAttribute("successMessage", "Movie added successfully!");
-	     } catch (Exception e) {
-	         e.printStackTrace();
-	         redirectAttributes.addFlashAttribute("errorMessage", "An error occurred while adding the movie.");
-	     }
-	     
-	     return "redirect:/admin/showmovies";
-	 }
-
 
 
 

@@ -52,17 +52,17 @@ th:fragment="Layout(content)">
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link" href="/movies/top">Phim Hot</a>
+                    <a class="nav-link" href="/movies/top">Top Movie</a>
                 </li>
                
                 <li class="nav-item">
-                    <a class="nav-link" href="/movies/newest">Phim Mới</a>
+                    <a class="nav-link" href="/movies/newest">Newest Movie</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/movies/faq">FAQ</a>
                 </li>
                 <li class="nav-item">
-    <a class="nav-link" href="/movies/search">Tìm Kiếm</a>	
+    <a class="nav-link" href="/movies/search">Search</a>	
     
            </ul>
            
@@ -74,20 +74,20 @@ th:fragment="Layout(content)">
     </button>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
         <li th:if="${user == null}">
-            <a class="dropdown-item" href="/login">Đăng Nhập</a>
+            <a class="dropdown-item" href="/login">Login</a>
         </li>
         <li th:if="${user == null}">
-            <a class="dropdown-item" href="/register">Đăng Kí</a>
+            <a class="dropdown-item" href="/register">Register</a>
         </li>
         <li th:if="${user != null}">
-            <a class="dropdown-item" href="/users/profile">Thông Tin</a>
+            <a class="dropdown-item" href="/users/profile">Profile</a>
         </li>
          <!-- Conditionally show the "Quản lí" button if user role is admin -->
         <li th:if="${user != null and user.role == 'ADMIN'}">
-            <a class="dropdown-item" href="/admin/test">Quản lí</a>
+            <a class="dropdown-item" href="/admin/test">Manage</a>
         </li>
         <li th:if="${user != null}">
-            <a class="dropdown-item" href="logout">Đăng Xuất</a>
+            <a class="dropdown-item" href="logout">Logout</a>
         </li>
        
     </ul>

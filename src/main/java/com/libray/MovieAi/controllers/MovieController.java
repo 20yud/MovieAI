@@ -3,6 +3,7 @@ package com.libray.MovieAi.controllers;
 import com.libray.MovieAi.models.Genre;
 import com.libray.MovieAi.models.Movie;
 import com.libray.MovieAi.models.User;
+import com.libray.MovieAi.services.JustWatchedService;
 import com.libray.MovieAi.services.MovieService;
 import com.libray.MovieAi.services.MoviesRepository;
 import com.libray.MovieAi.services.UserService;
@@ -43,6 +44,9 @@ public class MovieController {
     @Autowired
     private UserService userService;
     
+    @Autowired
+    private JustWatchedService justWatchedService;
+    
     @GetMapping("/watch/{id}")
     public String showWatchPage(@PathVariable("id") int id, Model model) {
         Movie movie = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid movie Id:" + id));
@@ -70,12 +74,41 @@ public class MovieController {
             embedLink = "https://vip.opstream16.com/share/814411c7a909ca15fc65a67b585ddd4d";
         
         }
+        
+     // Add user profile information if authenticated
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
+            String username = auth.getName(); // Get username of logged-in user
+            User user = userService.getUserByUsername(username); // Assuming you have a method to retrieve user by username
+            model.addAttribute("user", user);
+        } else {
+            model.addAttribute("user", null);
+        }
         model.addAttribute("movie", movie);
         model.addAttribute("embedLink", embedLink);
         return "movies/watch";
     }
 
+    @GetMapping("/justwatched/{id}")
+    public String addJustWatched(@PathVariable("id") int id) {
+        // Retrieve user_id from authenticated session
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            throw new IllegalStateException("User must be authenticated to perform this action");
+        }
 
+        String username = auth.getName(); // Get username of logged-in user
+        User user = userService.getUserByUsername(username); // Retrieve user entity
+        int userId = user.getId(); // Get user ID
+
+        // System print to show userId and movieId
+        System.out.println("Adding to just_watched - userId: " + userId + ", movieId: " + id);
+
+        // Call JustWatchedService to add to JustWatched table
+        justWatchedService.addJustWatched(userId, id);
+
+        return "redirect:/movies/watch/" + id;
+    }
     
 
     @GetMapping("/detail/{id}")
@@ -112,6 +145,7 @@ public class MovieController {
             e.printStackTrace();
             model.addAttribute("recommendedMovies", List.of()); // Add an empty list if there is an error
         }
+     // Java Code: Handling model attributes and API calls
         String genreApiUrl = "http://localhost:5555/api/genre-suggest?id=" + id;
         try {
             Map<String, Object> genreResponse = restTemplate.getForObject(genreApiUrl, Map.class);
@@ -127,24 +161,21 @@ public class MovieController {
             e.printStackTrace();
             model.addAttribute("genreRecommendedMovies", List.of()); // Add an empty list if there is an error
         }
-        
-        
-        //model
-        
-        String genApiUrl = "http://localhost:5556/api/movie-recommendations?id=" + id;
+
+        String genrecApiUrl = "http://localhost:5555/api/movie-recommendations?id=" + id;
         try {
-            Map<String, Object> genreResponse = restTemplate.getForObject(genApiUrl, Map.class);
-            if (genreResponse != null && genreResponse.containsKey("top_genres")) {
-                List<Map<String, Object>> grecommendermodel = (List<Map<String, Object>>) genreResponse.get("top_genres");
+            Map<String, Object> genreResponse = restTemplate.getForObject(genrecApiUrl, Map.class);
+            if (genreResponse != null && genreResponse.containsKey("recommended_movies")) {
+                List<Map<String, Object>> grecommendermodel = (List<Map<String, Object>>) genreResponse.get("recommended_movies");
                 System.out.println("Genre-based Recommended Movies: " + grecommendermodel);
                 model.addAttribute("grecommendermodel", grecommendermodel);
             } else {
                 System.out.println("No genre-based recommended movies found in the response.");
-                model.addAttribute("grecommendermodel", List.of()); // Add an empty list if no recommendations
+                model.addAttribute("grecommendermodel", List.of());
             }
         } catch (Exception e) {
             e.printStackTrace();
-            model.addAttribute("grecommendermodel", List.of()); // Add an empty list if there is an error
+            model.addAttribute("grecommendermodel", List.of());
         }
 
 
