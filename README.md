@@ -15,7 +15,7 @@ This project functions as a web application similar to a movie website, aiding u
 2. **Install Eclipse**:
    ```sh
    Import project to Eclipse
-3. **Update and Import SQL **:
+3. **Update and Import SQL**:
    ```sh
    Update Maven and Run SQL FILE
 4. **Run**:
