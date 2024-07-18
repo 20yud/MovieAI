@@ -4,7 +4,7 @@ This project functions as a web application similar to a movie website, aiding u
 
 ## Links
 
-- **Dataset**: [Kaggle - UTKFace](https://www.kaggle.com/datasets/neha1703/movie-genre-from-its-poster)
+- **Dataset**: [Kaggle - Movie Genre from its Poster](https://www.kaggle.com/datasets/neha1703/movie-genre-from-its-poster)
 - **Maven version**: 4.0.0
 
 ## Setup
